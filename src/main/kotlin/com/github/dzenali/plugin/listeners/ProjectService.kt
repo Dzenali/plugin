@@ -1,17 +1,12 @@
-package com.github.dzenali.plugin.services
+package be.unamur.mucoop.listeners
 
-import be.unamur.mucoop.listeners.MutationsListener
-import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
-import com.intellij.openapi.project.Project
-import com.github.dzenali.plugin.MyBundle
-import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.Disposable
-
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFileManager
 
 @Service(Service.Level.PROJECT)
-class MyProjectService(project: Project): Disposable {
-
+class ProjectService (val project: Project): Disposable {
     init {
         println("project Service initialization")
 
@@ -19,6 +14,4 @@ class MyProjectService(project: Project): Disposable {
     }
 
     override fun dispose() = Unit
-
-    fun getRandomNumber() = (1..100).random()
 }

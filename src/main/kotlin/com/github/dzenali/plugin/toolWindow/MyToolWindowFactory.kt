@@ -16,13 +16,17 @@ import javax.swing.JButton
 class MyToolWindowFactory : ToolWindowFactory {
 
     init {
-        thisLogger().warn("Don't forget to remove all non-needed sample code files with their corresponding registration entries in `plugin.xml`.")
+        thisLogger().debug("GamificationToolWindow")
     }
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val myToolWindow = MyToolWindow(toolWindow)
-        val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(), null, false)
+        val panel = WindowPanel(project).create()
+
+        val content = ContentFactory.getInstance().createContent(panel, null, false)
         toolWindow.contentManager.addContent(content)
+        //val myToolWindow = MyToolWindow(toolWindow)
+        //val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(), null, false)
+        //toolWindow.contentManager.addContent(content)
     }
 
     override fun shouldBeAvailable(project: Project) = true
