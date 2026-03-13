@@ -1,5 +1,6 @@
 package com.github.dzenali.plugin.achievements
 
+import com.github.dzenali.plugin.toolWindow.WindowPanel
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.DataManager
 import com.intellij.ide.util.PropertiesComponent
@@ -25,10 +26,6 @@ abstract class Achievement {
     abstract fun getName(): String
 
     abstract fun getDescription(): String
-
-    fun showAchievementNotification() {
-
-    }
 
     fun handleProgress() {
 
@@ -58,12 +55,12 @@ abstract class Achievement {
         val project = DataManager.getInstance().dataContextFromFocusAsync.blockingGet(10, TimeUnit.SECONDS)!!.getData(PlatformDataKeys.PROJECT)
         val toolWindow = ToolWindowManager.getInstance(project!!).getToolWindow("Gamification")!!
 
-        /*SwingUtilities.invokeLater {
+        SwingUtilities.invokeLater {
             toolWindow.contentManager.removeAllContents(true)
             val panel = WindowPanel(project).create()
             val content = ContentFactory.getInstance().createContent(panel, null, false)
             toolWindow.contentManager.addContent(content)
-        }*/
+        }
     }
 
     fun isDone(): Boolean {

@@ -6,10 +6,10 @@ import com.intellij.openapi.vfs.newvfs.BulkFileListener
 
 object Kill10MutantsAchievement : Achievement(), BulkFileListener {
 
-
+    //Returns min between 10 and mutants killed
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
-        return properties.getInt(getPropertyKey(), 0)
+        return minOf(properties.getInt(getPropertyKey(), 0), 10)
     }
 
     override fun updateProgress(progress: Int) {
