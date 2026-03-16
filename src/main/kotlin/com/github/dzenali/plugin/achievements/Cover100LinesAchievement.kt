@@ -3,7 +3,7 @@ package com.github.dzenali.plugin.achievements
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
-import de.uni_passau.fim.se2.intelligame.util.CoverageInfo
+import com.github.dzenali.plugin.util.CoverageInfo
 
 object Cover100LinesAchievement: Achievement() {
 
@@ -12,9 +12,7 @@ object Cover100LinesAchievement: Achievement() {
             return
         }
         var progress = progress()
-        println(progress)
         progress += coverageInfo.coveredLineCount
-        println(progress)
         updateProgress(progress)
     }
     override fun progress(): Int {

@@ -12,7 +12,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import de.uni_passau.fim.se2.intelligame.util.CoverageInfo
+import com.github.dzenali.plugin.util.CoverageInfo
 import java.lang.reflect.Field
 
 object CoverageListener: CoverageSuiteListener {
@@ -20,7 +20,6 @@ object CoverageListener: CoverageSuiteListener {
     private lateinit var testRunName: String
 
     override fun coverageGathered(suite: CoverageSuite) {
-        println("coveragegethered")
         project = suite.project
 
         testRunName = (suite as BaseCoverageSuite).configuration!!.name
@@ -30,10 +29,8 @@ object CoverageListener: CoverageSuiteListener {
     override fun beforeSuiteChosen() = Unit
 
     override fun afterSuiteChosen() {
-        println("aftersuitechosen")
         val dataManager = CoverageDataManager.getInstance(project)
         if (ApplicationManager.getApplication().isUnitTestMode) {
-            println("is unit test mode")
             return
         }
 
@@ -43,7 +40,6 @@ object CoverageListener: CoverageSuiteListener {
         val modalTask: Task.Modal = object : Task.Modal(project, "Modal Cancelable Task", false) {
             override fun run(indicator: ProgressIndicator) {
                 if (annotator::class.simpleName == "JavaCoverageAnnotator") {
-                    println("trigger")
                     javaCoverage()
                 }
             }
@@ -56,9 +52,7 @@ object CoverageListener: CoverageSuiteListener {
 
 
                 val runClassName = testRunName.split(".").first().replace("Test", "")
-                println("coverage")
                 for ((key, value) in classCoverageInfosValue.filter { (it.key as String).contains(runClassName) }) {
-                    println("for loop")
                     val coverageInfo = extractCoverageInfos(value)
                     Cover100LinesAchievement.triggerAchievement(coverageInfo, project)
 
