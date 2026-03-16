@@ -32,8 +32,8 @@ class AchievementsUI {
 
         private fun achievementList(): JPanel {
             val panel = panel {
-                for (achievement in getAchievements()) {
-                    groupRowsRange("Achievements") {
+                groupRowsRange("Achievements") {
+                    for (achievement in getAchievements()) {
                         row{
                             icon(getAchievementIcon(achievement))
                             label(achievement.getName()).align(AlignX.LEFT)

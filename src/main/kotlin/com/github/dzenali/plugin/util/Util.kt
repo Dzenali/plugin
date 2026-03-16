@@ -1,7 +1,10 @@
 package com.github.dzenali.plugin.util
 
 import com.github.dzenali.plugin.achievements.Achievement
+import com.github.dzenali.plugin.achievements.Add10TestsAchievement
+import com.github.dzenali.plugin.achievements.Cover100LinesAchievement
 import com.github.dzenali.plugin.achievements.Kill10MutantsAchievement
+import com.github.dzenali.plugin.achievements.KillAllMutantsAchievement
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 
@@ -25,6 +28,12 @@ object Util{
     }
 
     fun getAchievements(): List<Achievement> {
-        return listOf(Kill10MutantsAchievement)
+        return listOf(
+            Kill10MutantsAchievement,
+            Cover100LinesAchievement,
+            Add10TestsAchievement,
+            KillAllMutantsAchievement,
+
+        )
     }
 }

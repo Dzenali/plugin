@@ -1,6 +1,7 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 
 plugins {
     id("java") // Java support
@@ -35,6 +36,13 @@ dependencies {
     testImplementation(libs.opentest4j)
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
+    implementation(libs.commonsText)
+    implementation(libs.javaDiff)
+    implementation(libs.refactoringMiner)
+    implementation(libs.okhttp)
+    implementation(libs.gson)
+
+    testImplementation(libs.junit)
 
     // IntelliJ Platform Gradle Plugin Dependencies Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
@@ -108,6 +116,15 @@ intellijPlatform {
         ides {
             recommended()
         }
+        failureLevel.set(
+            listOf(
+                VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES,
+                VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS,
+                VerifyPluginTask.FailureLevel.OVERRIDE_ONLY_API_USAGES,
+                VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES,
+                VerifyPluginTask.FailureLevel.PLUGIN_STRUCTURE_WARNINGS,
+            )
+        )
     }
 }
 

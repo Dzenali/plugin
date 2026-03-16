@@ -5,7 +5,9 @@
     <vendor>dzenali</vendor>
 
     <depends>com.intellij.modules.platform</depends>
-
+    <depends>com.intellij.modules.coverage</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.java</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
@@ -14,7 +16,5 @@
         <postStartupActivity implementation="com.github.dzenali.plugin.startup.MyProjectActivity" />
 
         <notificationGroup id="Gamification" displayType="BALLOON"/>
-
-        <postStartupActivity implementation="com.github.dzenali.plugin.startup.MyProjectActivity"/>
     </extensions>
 </idea-plugin>

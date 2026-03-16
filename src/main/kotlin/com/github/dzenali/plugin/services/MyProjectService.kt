@@ -5,6 +5,8 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.github.dzenali.plugin.MyBundle
+import com.github.dzenali.plugin.listeners.CoverageListener
+import com.intellij.coverage.CoverageDataManager
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.Disposable
 
@@ -16,6 +18,7 @@ class MyProjectService(project: Project): Disposable {
         println("project Service initialization")
 
         project.messageBus.connect(this).subscribe(VirtualFileManager.VFS_CHANGES, MutationsListener)
+        CoverageDataManager.getInstance(project).addSuiteListener(CoverageListener, this)
     }
 
     override fun dispose() = Unit
