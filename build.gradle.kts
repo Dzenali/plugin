@@ -35,7 +35,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.opentest4j)
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.21.1")
     implementation(libs.commonsText)
     implementation(libs.javaDiff)
     implementation(libs.refactoringMiner)
