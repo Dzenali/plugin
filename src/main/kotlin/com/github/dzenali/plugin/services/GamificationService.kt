@@ -14,8 +14,8 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.EditorNotifications
 import com.intellij.ui.content.ContentFactory
 import com.github.dzenali.plugin.MyBundle
-import com.github.dzenali.plugin.achievements.Achievement
 import com.github.dzenali.plugin.command.*
+import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.toolWindow.WindowPanel
 import com.github.dzenali.plugin.util.*
 import kotlinx.coroutines.GlobalScope
@@ -29,7 +29,6 @@ import java.sql.Timestamp
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.swing.SwingUtilities
-import kotlin.reflect.KClass
 
 @Service(Service.Level.PROJECT)
 class GamificationService(val project: Project) : Disposable {
@@ -41,18 +40,16 @@ class GamificationService(val project: Project) : Disposable {
     private var gameMode: GameMode = GameMode.valueOf(
         properties.getValue("gamification-game-mode", GameMode.LEADERBOARD.name)
     )
-
     private var userId = ""
     private var username = ""
+    private var teamName = ""
+    private var teamId = ""
     private var apiKey = ""
     private val csvPath = Util.getEvaluationFilePath(project, "Actions.csv")
     private val actionCSV = CSVFile(listOf("Action", "Name", "Points", "GameMode", "Timestamp"))
-
     private var webSocketUrl = MyBundle.getMessage("websocketURL")
     private var apiUrl = MyBundle.getMessage("apiURL")
-
     private val heartbeatInterval = MyBundle.getMessage("heartbeatInterval", "30000").toLong()
-
     private val webSocketListener = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
@@ -116,6 +113,8 @@ class GamificationService(val project: Project) : Disposable {
         userId = getPropertyValue("gamification-user-id", UUID.randomUUID().toString())
         username = getPropertyValue("gamification-username", Util.generatePseudo())
         apiKey = getPropertyValue("gamification-api-key", "")
+        teamName = getPropertyValue("gamification-team-name", "")
+        teamId = getPropertyValue("gamification-team-id", "")
 
         connect()
     }
@@ -158,32 +157,6 @@ class GamificationService(val project: Project) : Disposable {
         return defaultValue
     }
 
-    fun addPoints(pointsToAdd: Int, achievementClass: KClass<out Achievement>) {
-        val className = achievementClass.simpleName!!
-
-        webSocketClient.send(
-            gson.toJson(
-                AddActivityCommand(
-                    AddActivityCommandData(userId, pointsToAdd, className, gameMode.ordinal)
-                )
-            )
-        )
-
-        val instance = achievementClass.objectInstance!!
-        actionCSV.appendLine(
-            listOf(
-                className,
-                instance.getName(),
-                pointsToAdd.toString(),
-                gameMode.name,
-                Timestamp(System.currentTimeMillis()).toString()
-            )
-        )
-
-        actionCSV.save(csvPath)
-        EditorNotifications.getInstance(project).updateAllNotifications()
-    }
-
     fun connect() {
         Logger.logStatus("Connect to $webSocketUrl", Logger.Kind.Debug, project)
 
@@ -220,8 +193,38 @@ class GamificationService(val project: Project) : Disposable {
         connect()
     }
 
+    fun joinTeam(teamName: String) {
+        this.teamName = teamName
+        properties.setValue("gamification-team-name", teamName)
+        webSocketClient.send(
+            gson.toJson(
+                JoinTeamCommand(
+                    JoinTeamCommandData(userId, username, teamName)
+                )
+            )
+        )
+
+        actionCSV.appendLine(
+            listOf(
+                "updateTeam",
+                teamName,
+                gameMode.name,
+                Timestamp(System.currentTimeMillis()).toString()
+            )
+        )
+        actionCSV.save(csvPath)
+    }
+
     fun getUsername(): String {
         return username
+    }
+
+    fun getTeamId(): String {
+        return teamId
+    }
+
+    fun getTeamName(): String {
+        return teamName
     }
 
     private fun setWebSocketState(state: WebSocketState) {
@@ -244,17 +247,11 @@ class GamificationService(val project: Project) : Disposable {
         val command = gson.fromJson(message, DefaultCommand::class.java)
 
         when (command.action) {
-            "onInitUsers" -> onInitUsers(message)
             "onUserActivityUpdated" -> onUserActivityUpdated(message)
             "onUserAdded" -> onUserAdded(message)
             "onUsernameUpdated" -> onUsernameUpdated(message)
+            "onTeamUpdated" -> onTeamUpdated(message)
         }
-    }
-
-    private fun onInitUsers(message: String) {
-        val initUsersCommand = gson.fromJson(message, InitUsersCommand::class.java)
-        //Leaderboard.updateUser(user)
-        refresh()
     }
 
     private fun onUserActivityUpdated(message: String) {
@@ -286,7 +283,14 @@ class GamificationService(val project: Project) : Disposable {
             properties.setValue("gamification-username", username)
         }
 
-        //Leaderboard.updateUser(user)
+        Team.updateUser(user)
+        refresh()
+    }
+
+    private fun onTeamUpdated(message: String) {
+        val onTeamUpdatedCommand = gson.fromJson(message, OnTeamUpdatedCommand::class.java)
+        val users = onTeamUpdatedCommand.payload
+        Team.setUsers(users)
         refresh()
     }
 
