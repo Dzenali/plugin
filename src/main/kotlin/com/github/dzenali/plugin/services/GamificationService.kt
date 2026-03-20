@@ -18,6 +18,7 @@ import com.github.dzenali.plugin.command.*
 import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.toolWindow.WindowPanel
 import com.github.dzenali.plugin.util.*
+import com.intellij.openapi.application.ApplicationManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,7 +39,7 @@ class GamificationService(val project: Project) : Disposable {
     private var webSocketState = WebSocketState.DISCONNECTED
     private val properties = PropertiesComponent.getInstance()
     private var gameMode: GameMode = GameMode.valueOf(
-        properties.getValue("gamification-game-mode", GameMode.LEADERBOARD.name)
+        properties.getValue("gamification-game-mode", GameMode.SOLO.name)
     )
     private var userId = ""
     private var username = ""
@@ -53,8 +54,6 @@ class GamificationService(val project: Project) : Disposable {
     private val webSocketListener = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             super.onOpen(webSocket, response)
-
-            setWebSocketState(WebSocketState.CONNECTED)
 
             properties.setValue("gamification-api-key", apiKey)
 
@@ -71,6 +70,7 @@ class GamificationService(val project: Project) : Disposable {
             }
 
             Logger.logStatus("Websocket connection opened", Logger.Kind.Debug, project)
+            refresh()
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
@@ -83,6 +83,11 @@ class GamificationService(val project: Project) : Disposable {
 
             Logger.logStatus("Websocket failure : ${t.message}", Logger.Kind.Error, project)
             setWebSocketState(WebSocketState.ERROR)
+            teamName = ""
+            teamId = ""
+            properties.setValue("gamification-team-name", "")
+            properties.setValue("gamification-team-id", "")
+            refresh()
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
@@ -96,6 +101,10 @@ class GamificationService(val project: Project) : Disposable {
                 properties.unsetValue("gamification-api-key")
                 apiKey = ""
                 setWebSocketState(WebSocketState.INVALID_API_KEY)
+                teamName = ""
+                teamId = ""
+                properties.setValue("gamification-team-name", "")
+                properties.setValue("gamification-team-id", "")
             }
         }
 
@@ -104,6 +113,7 @@ class GamificationService(val project: Project) : Disposable {
 
             Logger.logStatus("Websocket closed : $reason | code : $code", Logger.Kind.Debug, project)
             setWebSocketState(WebSocketState.DISCONNECTED)
+            refresh()
         }
     }
 
@@ -194,8 +204,6 @@ class GamificationService(val project: Project) : Disposable {
     }
 
     fun joinTeam(teamName: String) {
-        this.teamName = teamName
-        properties.setValue("gamification-team-name", teamName)
         webSocketClient.send(
             gson.toJson(
                 JoinTeamCommand(
@@ -203,16 +211,16 @@ class GamificationService(val project: Project) : Disposable {
                 )
             )
         )
+    }
 
-        actionCSV.appendLine(
-            listOf(
-                "updateTeam",
-                teamName,
-                gameMode.name,
-                Timestamp(System.currentTimeMillis()).toString()
+    fun leaveTeam() {
+        webSocketClient.send(
+            gson.toJson(
+                LeaveTeamCommand(
+                    LeaveTeamCommandData(userId, username, teamName)
+                )
             )
         )
-        actionCSV.save(csvPath)
     }
 
     fun getUsername(): String {
@@ -251,7 +259,42 @@ class GamificationService(val project: Project) : Disposable {
             "onUserAdded" -> onUserAdded(message)
             "onUsernameUpdated" -> onUsernameUpdated(message)
             "onTeamUpdated" -> onTeamUpdated(message)
+            "joinTeam" -> onJoinedTeam(message)
+            "leaveTeam" -> onTeamLeft()
         }
+    }
+
+    private fun onJoinedTeam(message: String) {
+        val joinTeamCommand = gson.fromJson(message, JoinTeamCommand::class.java)
+        val data = joinTeamCommand.payload
+        val teamName = data.teamName
+        val userId = data.userId
+
+        if(this.userId == userId){
+            properties.setValue("gamification-team-name", data.teamName)
+            this.teamName = teamName
+
+            actionCSV.appendLine(
+                listOf(
+                    "updateTeam",
+                    teamName,
+                    gameMode.name,
+                    Timestamp(System.currentTimeMillis()).toString()
+                )
+            )
+            actionCSV.save(csvPath)
+        }
+        refresh()
+    }
+
+    private fun onTeamLeft() {
+        teamName = ""
+        teamId = ""
+        properties.setValue("gamification-team-name", "")
+        properties.setValue("gamification-team-id", "")
+        Team.setUsers(listOf())
+        refresh()
+
     }
 
     private fun onUserActivityUpdated(message: String) {
@@ -259,7 +302,7 @@ class GamificationService(val project: Project) : Disposable {
         val data = onUserActivityUpdatedCommand.payload
         val user = data.user
 
-        if (user.id == userId && gameMode == GameMode.LEADERBOARD) {
+        if (user.id == userId && gameMode == GameMode.TEAM) {
             showNotification("You have earned ${data.earnedPoints} points.")
         }
 

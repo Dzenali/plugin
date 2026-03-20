@@ -29,7 +29,6 @@ object Team {
 
     fun setUsers(users : List<User>) {
         reset()
-
         for(user in users){
             this.users.add(user)
         }

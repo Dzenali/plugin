@@ -17,12 +17,9 @@ class WindowPanel(val project: Project): JBTabbedPane() {
 
         val achievements = AchievementsUI.create(project)
         tabbedPane.addTab("Solo", achievements)
-        val achievementsTeam = null
-        if(properties.getValue("gamification-team-name").isNullOrBlank()) {
-            val achievementsTeam = AchievementsTeamUI.requestTeamName(project)
-        }else {
-            val achievementsTeam = AchievementsTeamUI.create(project)
-        }
+
+        val achievementsTeam = AchievementsTeamUI.create(project)
+
         tabbedPane.addTab("Team", achievementsTeam)
 
         return tabbedPane

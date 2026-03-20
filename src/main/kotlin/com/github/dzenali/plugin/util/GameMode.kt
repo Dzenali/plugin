@@ -1,5 +1,5 @@
 ﻿package com.github.dzenali.plugin.util
 
 enum class GameMode {
-    LEADERBOARD, ACHIEVEMENTS, SETTINGS
+    SOLO, TEAM, SETTINGS
 }

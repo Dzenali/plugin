@@ -12,7 +12,7 @@
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.dzenali.plugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow factoryClass="com.github.dzenali.plugin.toolWindow.MyToolWindowFactory" id="Gamification"/>
         <postStartupActivity implementation="com.github.dzenali.plugin.startup.MyProjectActivity" />
 
         <notificationGroup id="Gamification" displayType="BALLOON"/>
