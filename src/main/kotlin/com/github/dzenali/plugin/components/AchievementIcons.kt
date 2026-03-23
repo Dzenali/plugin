@@ -10,6 +10,7 @@ object AchievementIcons {
         "Cover100LinesAchievement" to IconLoader.getIcon("/icons/Cover100LinesAchievementIcon.png", javaClass),
         "KillAllMutantsAchievement" to IconLoader.getIcon("/icons/KillAllMutantsAchievementIcon.png", javaClass),
         "Add10TestsAchievement" to IconLoader.getIcon("/icons/Add10TestsAchievementIcon.png", javaClass),
+
     )
 
     val lockedIcon: Icon = IconLoader.getIcon("/icons/AchievementLockedIcon.png", javaClass)

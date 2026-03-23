@@ -2,6 +2,8 @@ package com.github.dzenali.plugin.achievements
 
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.newvfs.BulkFileListener
 
 object Add10TestsAchievement: Achievement() {
 
@@ -10,16 +12,14 @@ object Add10TestsAchievement: Achievement() {
         return minOf(properties.getInt(getPropertyKey(), 0), 10)
     }
 
-    override fun updateProgress(progress: Int) {
+    override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), progress, 0)
-        if( properties.getInt(getPropertyKey(),0) >= 10){
-            properties.setValue(getPropertyKey() + "status", "done")
-        }
+        handleProgress(progress(), 10, "You successfully added 10 tests", project)
     }
 
-    override fun updateProgress(mutants: List<Mutation>) {
-        TODO("Not yet implemented")
+    override fun updateProgress(mutants: List<Mutation>, project: Project?) {
+        TODO("Feature Not yet implemented")
     }
 
     override fun getName(): String {

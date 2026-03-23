@@ -7,29 +7,26 @@ import com.github.dzenali.plugin.util.CoverageInfo
 
 object Cover100LinesAchievement: Achievement() {
 
-    fun triggerAchievement(coverageInfo: CoverageInfo, project: Project?) {
+    fun triggerAchievement(coverageInfo: CoverageInfo, project: Project) {
         if(coverageInfo.coveredLineCount <= 0 || isDone()){
             return
         }
         var progress = progress()
         progress += coverageInfo.coveredLineCount
-        updateProgress(progress)
+        updateProgress(progress, project)
     }
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
         return properties.getInt(getPropertyKey(), 0)
     }
 
-    override fun updateProgress(progress: Int) {
+    override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), progress, 0)
-        if( properties.getInt(getPropertyKey(),0) >= 100){
-            properties.setValue(getPropertyKey() + "status", "done")
-            showAchievementNotification("You Covered 100 Lines of code !", null)
-        }
+        handleProgress(progress(), 100, "You successfully added 100 tests", project)
     }
 
-    override fun updateProgress(mutants: List<Mutation>) {
+    override fun updateProgress(mutants: List<Mutation>, project: Project?) {
         TODO("Not yet implemented")
     }
 

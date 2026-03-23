@@ -6,13 +6,15 @@ import com.intellij.coverage.CoverageSuite
 import com.intellij.coverage.CoverageSuiteListener
 import com.intellij.coverage.CoverageSuitesBundle
 import com.github.dzenali.plugin.achievements.*
-//import com.github.dzenali.plugin.util.CoverageInfo
+import com.github.dzenali.plugin.services.GamificationService
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.github.dzenali.plugin.util.CoverageInfo
+import com.github.dzenali.plugin.util.Util
+import com.intellij.openapi.components.service
 import java.lang.reflect.Field
 
 object CoverageListener: CoverageSuiteListener {
@@ -50,12 +52,13 @@ object CoverageListener: CoverageSuiteListener {
                 classCoverageInfosField.isAccessible = true
                 val classCoverageInfosValue: Map<Any, Any> = classCoverageInfosField.get(annotator) as Map<Any, Any>
 
+                val gamificationService = project.service<GamificationService>()
 
                 val runClassName = testRunName.split(".").first().replace("Test", "")
-                for ((key, value) in classCoverageInfosValue.filter { (it.key as String).contains(runClassName) }) {
+                for ((key, value) in classCoverageInfosValue.filter { (it.key as String).contains(runClassName)  && !Util.isTestExcluded(it.key as String) }) {
                     val coverageInfo = extractCoverageInfos(value)
                     Cover100LinesAchievement.triggerAchievement(coverageInfo, project)
-
+                    gamificationService.updateCoverage(coverageInfo, key as String, testRunName, project)
                 }
 
                 val extensionCoverageField: Field = annotator.javaClass.getDeclaredField("myDirCoverageInfos")

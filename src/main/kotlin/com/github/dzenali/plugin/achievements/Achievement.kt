@@ -1,5 +1,6 @@
 package com.github.dzenali.plugin.achievements
 
+import com.github.dzenali.plugin.services.GamificationService
 import com.github.dzenali.plugin.toolWindow.WindowPanel
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.DataManager
@@ -8,6 +9,7 @@ import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.content.ContentFactory
@@ -19,16 +21,20 @@ abstract class Achievement {
     // How much of the required actions have been performed
     abstract fun progress(): Int
 
-    abstract fun updateProgress(progress: Int)
+    abstract fun updateProgress(progress: Int, project: Project?)
 
-    abstract fun updateProgress(mutants: List<Mutation>)
+    abstract fun updateProgress(mutants: List<Mutation>, project: Project?)
 
     abstract fun getName(): String
 
     abstract fun getDescription(): String
 
-    fun handleProgress() {
-
+    fun handleProgress(current: Int, target: Int, message: String, project: Project?) {
+        val properties = PropertiesComponent.getInstance()
+        if( current >= target && !isDone()){
+            properties.setValue(getPropertyKey() + "status", "done")
+            showAchievementNotification(message, project)
+        }
     }
 
     fun showAchievementNotification(message: String, project: Project?) {
@@ -66,7 +72,7 @@ abstract class Achievement {
     fun isDone(): Boolean {
         val properties = PropertiesComponent.getInstance()
         val isDone: String? = properties.getValue(getPropertyKey() + "status")
-        return !(isDone == null || isDone != "done")
+        return isDone == "done"
     }
 
     open fun getPropertyKey(): String{

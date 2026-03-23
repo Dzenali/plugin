@@ -14,6 +14,7 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.EditorNotifications
 import com.intellij.ui.content.ContentFactory
 import com.github.dzenali.plugin.MyBundle
+import com.github.dzenali.plugin.achievements.Achievement
 import com.github.dzenali.plugin.command.*
 import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.toolWindow.WindowPanel
@@ -30,6 +31,7 @@ import java.sql.Timestamp
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.swing.SwingUtilities
+import kotlin.reflect.KClass
 
 @Service(Service.Level.PROJECT)
 class GamificationService(val project: Project) : Disposable {
@@ -47,7 +49,7 @@ class GamificationService(val project: Project) : Disposable {
     private var teamId = ""
     private var apiKey = ""
     private val csvPath = Util.getEvaluationFilePath(project, "Actions.csv")
-    private val actionCSV = CSVFile(listOf("Action", "Name", "Points", "GameMode", "Timestamp"))
+    private val actionCSV = CSVFile(listOf("Action", "Name", "GameMode", "Timestamp"))
     private var webSocketUrl = MyBundle.getMessage("websocketURL")
     private var apiUrl = MyBundle.getMessage("apiURL")
     private val heartbeatInterval = MyBundle.getMessage("heartbeatInterval", "30000").toLong()
@@ -101,10 +103,6 @@ class GamificationService(val project: Project) : Disposable {
                 properties.unsetValue("gamification-api-key")
                 apiKey = ""
                 setWebSocketState(WebSocketState.INVALID_API_KEY)
-                teamName = ""
-                teamId = ""
-                properties.setValue("gamification-team-name", "")
-                properties.setValue("gamification-team-id", "")
             }
         }
 
@@ -113,6 +111,10 @@ class GamificationService(val project: Project) : Disposable {
 
             Logger.logStatus("Websocket closed : $reason | code : $code", Logger.Kind.Debug, project)
             setWebSocketState(WebSocketState.DISCONNECTED)
+            teamName = ""
+            teamId = ""
+            properties.setValue("gamification-team-name", "")
+            properties.setValue("gamification-team-id", "")
             refresh()
         }
     }
@@ -276,7 +278,7 @@ class GamificationService(val project: Project) : Disposable {
 
             actionCSV.appendLine(
                 listOf(
-                    "updateTeam",
+                    "joinTeam",
                     teamName,
                     gameMode.name,
                     Timestamp(System.currentTimeMillis()).toString()
@@ -293,6 +295,15 @@ class GamificationService(val project: Project) : Disposable {
         properties.setValue("gamification-team-name", "")
         properties.setValue("gamification-team-id", "")
         Team.setUsers(listOf())
+        actionCSV.appendLine(
+            listOf(
+                "leaveTeam",
+                teamName,
+                gameMode.name,
+                Timestamp(System.currentTimeMillis()).toString()
+            )
+        )
+        actionCSV.save(csvPath)
         refresh()
 
     }
@@ -379,6 +390,30 @@ class GamificationService(val project: Project) : Disposable {
             properties.unsetValue(achievement.getPropertyKey())
             //properties.unsetValue(achievement.getLevelPropertyKey())
         }
+    }
+
+    fun addAchievementDone(achievementClass: KClass<out Achievement>){
+        val className = achievementClass.simpleName!!
+
+        webSocketClient.send(
+            gson.toJson(
+                AddActivityCommand(
+                    AddActivityCommandData(userId, className, gameMode.ordinal)
+                )
+            )
+        )
+        val instance = achievementClass.objectInstance!!
+        actionCSV.appendLine(
+            listOf(
+                className,
+                instance.getName(),
+                gameMode.name,
+                Timestamp(System.currentTimeMillis()).toString()
+            )
+        )
+
+        actionCSV.save(csvPath)
+        EditorNotifications.getInstance(project).updateAllNotifications()
     }
 
     fun sendExperimentData(files: List<File>, canSendTestFiles: Boolean, canSendSourceFiles: Boolean, callback: ((Int?) -> Unit)? = null) {

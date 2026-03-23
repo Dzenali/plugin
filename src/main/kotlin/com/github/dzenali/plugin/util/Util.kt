@@ -49,6 +49,21 @@ object Util{
         )
     }
 
+    fun getTestAchievements(): List<Achievement>{
+        return listOf(
+            Add10TestsAchievement,
+
+        )
+    }
+
+    fun getMutantAchievements(): List<Achievement>{
+        return listOf(
+            Kill10MutantsAchievement,
+            KillAllMutantsAchievement,
+
+        )
+    }
+
     fun generatePseudo(): String {
         val adj = adjectives.random()
         val noun = nouns.random()

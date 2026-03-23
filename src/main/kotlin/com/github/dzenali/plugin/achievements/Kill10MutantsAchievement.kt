@@ -2,6 +2,7 @@ package com.github.dzenali.plugin.achievements
 
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 
 object Kill10MutantsAchievement : Achievement() {
@@ -12,7 +13,7 @@ object Kill10MutantsAchievement : Achievement() {
         return minOf(properties.getInt(getPropertyKey(), 0), 10)
     }
 
-    override fun updateProgress(progress: Int) {
+    override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), progress, 0)
         if( properties.getInt(getPropertyKey(),0) >= 10){
@@ -20,14 +21,11 @@ object Kill10MutantsAchievement : Achievement() {
         }
     }
 
-    override fun updateProgress(mutants: List<Mutation>) {
+    override fun updateProgress(mutants: List<Mutation>, project: Project?) {
         val nbMutants = mutants.filter { it.status == "KILLED" }.size
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), nbMutants, 0)
-        if( nbMutants >= 10){
-            properties.setValue(getPropertyKey() + "status", "done")
-            showAchievementNotification("You killed 10 mutants !", null)
-        }
+        handleProgress(nbMutants, 10, "10 mutants returned to primordial soup", project)
     }
 
     override fun getDescription(): String {

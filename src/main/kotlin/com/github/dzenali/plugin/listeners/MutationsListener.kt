@@ -1,4 +1,4 @@
-package be.unamur.mucoop.listeners
+package com.github.dzenali.plugin.listeners
 
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
@@ -7,6 +7,9 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.dzenali.plugin.util.Mutation
 import com.github.dzenali.plugin.util.MutationsWrapper
 import com.github.dzenali.plugin.util.Util.getAchievements
+import com.github.dzenali.plugin.util.Util.getMutantAchievements
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectLocator
 import java.io.File
 
 object MutationsListener : BulkFileListener {
@@ -21,10 +24,12 @@ object MutationsListener : BulkFileListener {
         val event = events.firstOrNull { it.path.endsWith("mutations.xml")}
         if (event != null) {
             val file = File(event.path)
-            mutants = parseMutations(event.path)
-
-            for(achievement in getAchievements()) {
-                if(!achievement.isDone()) achievement.updateProgress(mutants)
+            if (file.exists()) {
+                mutants = parseMutations(event.path)
+                val project = event.file?.let { ProjectLocator.getInstance().guessProjectForFile(it) }
+                for(achievement in getMutantAchievements()) {
+                    if(!achievement.isDone()) achievement.updateProgress(mutants, project)
+                }
             }
         }
         super.after(events)

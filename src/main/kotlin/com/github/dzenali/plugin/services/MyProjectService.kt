@@ -1,10 +1,9 @@
 package com.github.dzenali.plugin.services
 
-import be.unamur.mucoop.listeners.MutationsListener
+import com.github.dzenali.plugin.listeners.AddTestsListener
+import com.github.dzenali.plugin.listeners.MutationsListener
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
-import com.github.dzenali.plugin.MyBundle
 import com.github.dzenali.plugin.listeners.CoverageListener
 import com.intellij.coverage.CoverageDataManager
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -18,6 +17,7 @@ class MyProjectService(project: Project): Disposable {
         println("project Service initialization")
 
         project.messageBus.connect(this).subscribe(VirtualFileManager.VFS_CHANGES, MutationsListener)
+        project.messageBus.connect(this).subscribe(VirtualFileManager.VFS_CHANGES, AddTestsListener)
         CoverageDataManager.getInstance(project).addSuiteListener(CoverageListener, this)
     }
 

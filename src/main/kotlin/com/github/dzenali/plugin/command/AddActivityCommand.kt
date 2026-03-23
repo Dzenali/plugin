@@ -3,4 +3,4 @@
 data class AddActivityCommand(val payload: AddActivityCommandData){
     val action = "addActivity"
 }
-data class AddActivityCommandData(val id: String, val points: Int, val achievement: String, val gameMode: Int)
+data class AddActivityCommandData(val id: String, val achievement: String, val gameMode: Int)
