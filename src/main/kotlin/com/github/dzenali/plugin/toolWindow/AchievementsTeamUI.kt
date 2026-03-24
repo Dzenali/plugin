@@ -85,9 +85,9 @@ class AchievementsTeamUI {
                     }
                 }
                 groupRowsRange("Team Achievements") {
-                    if(true) {
+                    if(!gamificationService.getTeamAchievementUnlocked()) {
                         row {
-                            label("Some team members still need to unlock tier 1 achievements").align(AlignX.LEFT)
+                            label("Some team member still need to kill 10 mutants").align(AlignX.LEFT)
                         }
                     } else {
                         for (teamAchievement in getAchievements()) {

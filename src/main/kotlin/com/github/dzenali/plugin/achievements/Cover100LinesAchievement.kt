@@ -34,7 +34,7 @@ object Cover100LinesAchievement: Achievement() {
     }
 
     override fun getDescription(): String {
-        return("Cover 100 or more lines of code with your tests")
+        return("Cover 100 or more lines of code with your tests (coverage must be active)")
     }
 
 }

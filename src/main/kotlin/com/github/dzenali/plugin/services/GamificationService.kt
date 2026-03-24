@@ -19,7 +19,6 @@ import com.github.dzenali.plugin.command.*
 import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.toolWindow.WindowPanel
 import com.github.dzenali.plugin.util.*
-import com.intellij.openapi.application.ApplicationManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,6 +47,7 @@ class GamificationService(val project: Project) : Disposable {
     private var teamName = ""
     private var teamId = ""
     private var apiKey = ""
+    private var teamAchievementsUnlocked = false
     private val csvPath = Util.getEvaluationFilePath(project, "Actions.csv")
     private val actionCSV = CSVFile(listOf("Action", "Name", "GameMode", "Timestamp"))
     private var webSocketUrl = MyBundle.getMessage("websocketURL")
@@ -237,6 +237,8 @@ class GamificationService(val project: Project) : Disposable {
         return teamName
     }
 
+    fun getTeamAchievementUnlocked(): Boolean{return this.teamAchievementsUnlocked}
+
     private fun setWebSocketState(state: WebSocketState) {
         Logger.logStatus("Web socket state : $state", Logger.Kind.Debug, project)
         webSocketState = state
@@ -258,11 +260,11 @@ class GamificationService(val project: Project) : Disposable {
 
         when (command.action) {
             "onUserActivityUpdated" -> onUserActivityUpdated(message)
-            "onUserAdded" -> onUserAdded(message)
             "onUsernameUpdated" -> onUsernameUpdated(message)
             "onTeamUpdated" -> onTeamUpdated(message)
             "joinTeam" -> onJoinedTeam(message)
             "leaveTeam" -> onTeamLeft()
+            "onTeamAchievementsUnlocked" -> onTeamAchievementsUnlocked(message)
         }
     }
 
@@ -307,24 +309,19 @@ class GamificationService(val project: Project) : Disposable {
         refresh()
 
     }
-
+    //Receives error message if user not in database
     private fun onUserActivityUpdated(message: String) {
         val onUserActivityUpdatedCommand = gson.fromJson(message, OnUserActivityUpdatedCommand::class.java)
         val data = onUserActivityUpdatedCommand.payload
         val user = data.user
 
-        if (user.id == userId && gameMode == GameMode.TEAM) {
-            showNotification("You have earned ${data.earnedPoints} points.")
-        }
-
-        //Leaderboard.updateUser(user)
         refresh()
     }
 
-    private fun onUserAdded(message: String) {
-        val onUserAddedCommand = gson.fromJson(message, OnUserAddedCommand::class.java)
+    private fun onTeamAchievementsUnlocked(message: String) {
+        val onTeamAchievementsUnlocked = gson.fromJson(message, OnTeamAchievementsUnlocked::class.java)
+        this.teamAchievementsUnlocked = onTeamAchievementsUnlocked.payload
 
-        //Leaderboard.addUser(onUserAddedCommand.payload)
         refresh()
     }
 

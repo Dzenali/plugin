@@ -16,6 +16,7 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.content.ContentFactory
 import java.util.concurrent.TimeUnit
 import javax.swing.SwingUtilities
+import kotlin.reflect.KClass
 
 abstract class Achievement {
 
@@ -35,6 +36,7 @@ abstract class Achievement {
         if( current >= target && !isDone()){
             properties.setValue(getPropertyKey() + "status", "done")
             showAchievementNotification(message, project)
+            project?.service<GamificationService>()?.addAchievementDone(this::class)
         }
     }
 
@@ -49,7 +51,6 @@ abstract class Achievement {
                     val myProject = DataManager.getInstance().dataContextFromFocusAsync.blockingGet(10, TimeUnit.SECONDS)!!.getData(
                         PlatformDataKeys.PROJECT)
                     val toolWindow = ToolWindowManager.getInstance(myProject!!).getToolWindow("Gamification")!!
-
                     toolWindow.show()
                 }
             )
