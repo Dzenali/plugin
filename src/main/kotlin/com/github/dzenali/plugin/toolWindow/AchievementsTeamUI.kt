@@ -57,7 +57,7 @@ class AchievementsTeamUI {
             } else {
                 val users = usersList(PropertiesComponent.getInstance().getValue("gamification-team-name"), project)
 
-                val achievements = achievementList()
+                val achievements = achievementList(gamificationService)
                 val scrollPane = JBScrollPane(achievements)
 
                 val panel = JPanel(BorderLayout())
@@ -73,9 +73,9 @@ class AchievementsTeamUI {
         }
 
 
-        private fun achievementList(): JPanel {
+        private fun achievementList(gamificationService: GamificationService): JPanel {
             val panel = panel {
-                groupRowsRange("Achievements") {
+                groupRowsRange("Personal Achievements") {
                     for (achievement in getAchievements()) {
                         row{
                             icon(getAchievementIcon(achievement))
@@ -84,9 +84,26 @@ class AchievementsTeamUI {
                         }.resizableRow()
                     }
                 }
+                groupRowsRange("Team Achievements") {
+                    if(true) {
+                        row {
+                            label("Some team members still need to unlock tier 1 achievements").align(AlignX.LEFT)
+                        }
+                    } else {
+                        for (teamAchievement in getAchievements()) {
+                            row {
+                                icon(getAchievementIcon(teamAchievement))
+                                label(teamAchievement.getName()).align(AlignX.LEFT)
+                                contextHelp(teamAchievement.getDescription(), teamAchievement.getName())
+                            }
+                        }
+                    }
+                }
             }
             return panel
         }
+
+
 
         private fun getAchievementIcon(achievement: Achievement): Icon {
             return if (!achievement.isDone()) {

@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project
 import com.github.dzenali.plugin.util.CoverageInfo
 
 object Cover100LinesAchievement: Achievement() {
-
     fun triggerAchievement(coverageInfo: CoverageInfo, project: Project) {
         if(coverageInfo.coveredLineCount <= 0 || isDone()){
             return
@@ -23,7 +22,7 @@ object Cover100LinesAchievement: Achievement() {
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress(), 100, "You successfully added 100 tests", project)
+        handleProgress(progress(), 100, "You successfully covered 100 lines of code.", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {

@@ -55,6 +55,7 @@ object CoverageListener: CoverageSuiteListener {
                 val gamificationService = project.service<GamificationService>()
 
                 val runClassName = testRunName.split(".").first().replace("Test", "")
+
                 for ((key, value) in classCoverageInfosValue.filter { (it.key as String).contains(runClassName)  && !Util.isTestExcluded(it.key as String) }) {
                     val coverageInfo = extractCoverageInfos(value)
                     Cover100LinesAchievement.triggerAchievement(coverageInfo, project)
@@ -63,14 +64,6 @@ object CoverageListener: CoverageSuiteListener {
 
                 val extensionCoverageField: Field = annotator.javaClass.getDeclaredField("myDirCoverageInfos")
                 extensionCoverageField.isAccessible = true
-
-                val extensionCoverageInfosValue: Map<Any, Any> = extensionCoverageField.get(annotator) as Map<Any, Any>
-
-                if (extensionCoverageInfosValue.isEmpty()) {
-                    ApplicationManager.getApplication().invokeLater(fun() {
-                        ProgressManager.getInstance().run(this)
-                    })
-                }
             }
         }
 

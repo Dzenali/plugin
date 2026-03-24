@@ -2,6 +2,7 @@ package com.github.dzenali.plugin.achievements
 
 import com.github.dzenali.plugin.services.GamificationService
 import com.github.dzenali.plugin.toolWindow.WindowPanel
+import com.github.dzenali.plugin.util.Logger
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.DataManager
 import com.intellij.ide.util.PropertiesComponent
@@ -48,13 +49,13 @@ abstract class Achievement {
                     val myProject = DataManager.getInstance().dataContextFromFocusAsync.blockingGet(10, TimeUnit.SECONDS)!!.getData(
                         PlatformDataKeys.PROJECT)
                     val toolWindow = ToolWindowManager.getInstance(myProject!!).getToolWindow("Gamification")!!
-                    refreshWindow()
+
                     toolWindow.show()
                 }
             )
-
+        refreshWindow()
         notification.notify(null)
-
+        Logger.logStatus(message, Logger.Kind.Notification, project)
     }
 
     protected fun refreshWindow(){

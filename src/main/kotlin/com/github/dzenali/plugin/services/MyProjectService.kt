@@ -6,6 +6,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.github.dzenali.plugin.listeners.CoverageListener
 import com.intellij.coverage.CoverageDataManager
+import com.intellij.coverage.CoverageSuiteListener
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.Disposable
 
