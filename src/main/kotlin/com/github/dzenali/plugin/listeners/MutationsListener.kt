@@ -4,10 +4,12 @@ import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.github.dzenali.plugin.services.GamificationService
 import com.github.dzenali.plugin.util.Mutation
 import com.github.dzenali.plugin.util.MutationsWrapper
 import com.github.dzenali.plugin.util.Util.getAchievements
 import com.github.dzenali.plugin.util.Util.getMutantAchievements
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectLocator
 import java.io.File
@@ -27,6 +29,7 @@ object MutationsListener : BulkFileListener {
             if (file.exists()) {
                 mutants = parseMutations(event.path)
                 val project = event.file?.let { ProjectLocator.getInstance().guessProjectForFile(it) }
+                project!!.service<GamificationService>().sendUserMutantKilled(mutants.filter { it.status == "KILLED" })
                 for(achievement in getMutantAchievements()) {
                     if(!achievement.isDone()) achievement.updateProgress(mutants, project)
                 }

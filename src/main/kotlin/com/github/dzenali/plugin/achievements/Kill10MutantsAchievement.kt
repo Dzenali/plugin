@@ -14,11 +14,7 @@ object Kill10MutantsAchievement : Achievement() {
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
-        val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), progress, 0)
-        if( properties.getInt(getPropertyKey(),0) >= 10){
-            properties.setValue(getPropertyKey() + "status", "done")
-        }
+        TODO("Not yet implemented")
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {

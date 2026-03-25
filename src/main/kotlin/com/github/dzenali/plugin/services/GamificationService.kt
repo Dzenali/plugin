@@ -413,6 +413,16 @@ class GamificationService(val project: Project) : Disposable {
         EditorNotifications.getInstance(project).updateAllNotifications()
     }
 
+    fun sendUserMutantKilled(mutants: List<Mutation>) {
+        webSocketClient.send(
+            gson.toJson(
+                AddMutantsKilledCommand(
+                    AddMutantsKilledCommandData(userId, mutants)
+                )
+            )
+        )
+    }
+
     fun sendExperimentData(files: List<File>, canSendTestFiles: Boolean, canSendSourceFiles: Boolean, callback: ((Int?) -> Unit)? = null) {
         if (files.isEmpty() && callback != null) {
             callback(null)
