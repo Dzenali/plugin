@@ -15,6 +15,7 @@ import com.intellij.ui.EditorNotifications
 import com.intellij.ui.content.ContentFactory
 import com.github.dzenali.plugin.MyBundle
 import com.github.dzenali.plugin.achievements.Achievement
+import com.github.dzenali.plugin.achievements.CleanDragonAchievement
 import com.github.dzenali.plugin.command.*
 import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.toolWindow.WindowPanel
@@ -85,10 +86,7 @@ class GamificationService(val project: Project) : Disposable {
 
             Logger.logStatus("Websocket failure : ${t.message}", Logger.Kind.Error, project)
             setWebSocketState(WebSocketState.ERROR)
-            teamName = ""
-            teamId = ""
-            properties.setValue("gamification-team-name", "")
-            properties.setValue("gamification-team-id", "")
+            resetTeam()
             refresh()
         }
 
@@ -97,6 +95,7 @@ class GamificationService(val project: Project) : Disposable {
 
             Logger.logStatus("Websocket closing : $reason | code : $code", Logger.Kind.Debug, project)
 
+            resetTeam()
             if (code != 1008) {
                 setWebSocketState(WebSocketState.DISCONNECTING)
             } else {
@@ -111,10 +110,7 @@ class GamificationService(val project: Project) : Disposable {
 
             Logger.logStatus("Websocket closed : $reason | code : $code", Logger.Kind.Debug, project)
             setWebSocketState(WebSocketState.DISCONNECTED)
-            teamName = ""
-            teamId = ""
-            properties.setValue("gamification-team-name", "")
-            properties.setValue("gamification-team-id", "")
+            resetTeam()
             refresh()
         }
     }
@@ -178,6 +174,15 @@ class GamificationService(val project: Project) : Disposable {
 
         val request = Request.Builder().url(webSocketUrl).addHeader("API-KEY", apiKey).build()
         webSocketClient = httpClient.newWebSocket(request, webSocketListener)
+    }
+
+    fun reconnect(){
+        if(webSocketState == WebSocketState.DISCONNECTED
+            || webSocketState == WebSocketState.ERROR
+            || webSocketState == WebSocketState.INVALID_API_KEY) {
+            connect()
+        }
+        if(teamName != ""){joinTeam(teamName)}
     }
 
     fun disconnect() {
@@ -254,6 +259,13 @@ class GamificationService(val project: Project) : Disposable {
         EditorNotifications.getInstance(project).updateAllNotifications()
     }
 
+    private fun resetTeam(){
+        teamName = ""
+        teamId = ""
+        properties.setValue("gamification-team-name", "")
+        properties.setValue("gamification-team-id", "")
+    }
+
     private fun onReceiveMessage(message: String) {
         println("Received message: $message")
         val command = gson.fromJson(message, DefaultCommand::class.java)
@@ -265,6 +277,7 @@ class GamificationService(val project: Project) : Disposable {
             "joinTeam" -> onJoinedTeam(message)
             "leaveTeam" -> onTeamLeft()
             "onTeamAchievementsUnlocked" -> onTeamAchievementsUnlocked(message)
+            "TeamAchievementsProgress" -> teamAchievementProgress(message)
         }
     }
 
@@ -292,10 +305,6 @@ class GamificationService(val project: Project) : Disposable {
     }
 
     private fun onTeamLeft() {
-        teamName = ""
-        teamId = ""
-        properties.setValue("gamification-team-name", "")
-        properties.setValue("gamification-team-id", "")
         Team.setUsers(listOf())
         actionCSV.appendLine(
             listOf(
@@ -306,8 +315,8 @@ class GamificationService(val project: Project) : Disposable {
             )
         )
         actionCSV.save(csvPath)
+        resetTeam()
         refresh()
-
     }
     //Receives error message if user not in database
     private fun onUserActivityUpdated(message: String) {
@@ -515,6 +524,13 @@ class GamificationService(val project: Project) : Disposable {
                 )
             )
         )
+    }
+
+    fun teamAchievementProgress(message: String){
+        val teamAchievementCommand = gson.fromJson(message, TeamAchievementCommand::class.java)
+        val data = teamAchievementCommand.payload
+        CleanDragonAchievement.updateProgress(data.dragon, project)
+
     }
 
     override fun dispose() = Unit

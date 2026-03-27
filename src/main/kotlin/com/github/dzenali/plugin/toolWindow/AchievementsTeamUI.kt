@@ -5,6 +5,8 @@ import com.github.dzenali.plugin.components.AchievementIcons
 import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.services.GamificationService
 import com.github.dzenali.plugin.util.Util.getAchievements
+import com.github.dzenali.plugin.util.Util.getPersonalAchievements
+import com.github.dzenali.plugin.util.Util.getTeamAchievements
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -76,7 +78,7 @@ class AchievementsTeamUI {
         private fun achievementList(gamificationService: GamificationService): JPanel {
             val panel = panel {
                 groupRowsRange("Personal Achievements") {
-                    for (achievement in getAchievements()) {
+                    for (achievement in getPersonalAchievements()) {
                         row{
                             icon(getAchievementIcon(achievement))
                             label(achievement.getName()).align(AlignX.LEFT)
@@ -90,7 +92,7 @@ class AchievementsTeamUI {
                             label("Some team member still need to kill 10 mutants").align(AlignX.LEFT)
                         }
                     } else {
-                        for (teamAchievement in getAchievements()) {
+                        for (teamAchievement in getTeamAchievements()) {
                             row {
                                 icon(getAchievementIcon(teamAchievement))
                                 label(teamAchievement.getName()).align(AlignX.LEFT)
@@ -118,6 +120,9 @@ class AchievementsTeamUI {
             val panel = panel {
                 row {
                     label("Team: $teamName").align(AlignX.LEFT)
+                    button("Reconnect") {
+                        gamificationService.reconnect()
+                    }.align(AlignX.CENTER)
                     button("LeaveTeam") {
                         gamificationService.leaveTeam()
                     }.align(AlignX.RIGHT)

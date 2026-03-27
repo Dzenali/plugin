@@ -2,7 +2,9 @@ package com.github.dzenali.plugin.toolWindow
 
 import com.github.dzenali.plugin.achievements.Achievement
 import com.github.dzenali.plugin.components.AchievementIcons
+import com.github.dzenali.plugin.services.GamificationService
 import com.github.dzenali.plugin.util.Util.getAchievements
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.dsl.builder.AlignX
@@ -18,7 +20,7 @@ class AchievementsUI {
         fun create(project: Project): JPanel {
             val panel = JPanel(BorderLayout())
 
-            val achievements = achievementList()
+            val achievements = achievementList(project.service<GamificationService>())
 
             val scrollPane = JBScrollPane(achievements)
 
@@ -30,8 +32,13 @@ class AchievementsUI {
             return panel
         }
 
-        private fun achievementList(): JPanel {
+        private fun achievementList(gamificationService: GamificationService): JPanel {
             val panel = panel {
+                row {
+                        button("Reconnect") {
+                            gamificationService.reconnect()
+                        }.align(AlignX.CENTER)
+                    }
                 groupRowsRange("Achievements") {
                     for (achievement in getAchievements()) {
                         row{

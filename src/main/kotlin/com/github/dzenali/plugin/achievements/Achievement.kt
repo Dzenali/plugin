@@ -2,6 +2,7 @@ package com.github.dzenali.plugin.achievements
 
 import com.github.dzenali.plugin.services.GamificationService
 import com.github.dzenali.plugin.toolWindow.WindowPanel
+import com.github.dzenali.plugin.util.GameMode
 import com.github.dzenali.plugin.util.Logger
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.DataManager
@@ -33,10 +34,21 @@ abstract class Achievement {
 
     fun handleProgress(current: Int, target: Int, message: String, project: Project?) {
         val properties = PropertiesComponent.getInstance()
-        if( current >= target && !isDone()){
+        if( current >= target && !isDone() && requirementsMet(project)){
             properties.setValue(getPropertyKey() + "status", "done")
             showAchievementNotification(message, project)
             project?.service<GamificationService>()?.addAchievementDone(this::class)
+        }
+    }
+
+    open fun requirementsMet(project: Project?): Boolean {
+        val gamificationService = project?.service<GamificationService>()
+        val gameMode = gamificationService?.getGameMode()
+        val tierOk = gamificationService?.getTeamAchievementUnlocked()
+        if(gameMode == GameMode.SOLO || (gameMode == GameMode.TEAM && tierOk == true)) {
+            return true
+        } else {
+            return false
         }
     }
 

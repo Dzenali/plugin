@@ -1,11 +1,13 @@
 package com.github.dzenali.plugin.achievements
 
+import com.github.dzenali.plugin.services.GamificationService
+import com.github.dzenali.plugin.util.GameMode
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.newvfs.BulkFileListener
 
-object Add10TestsAchievement: Achievement() {
+object Add50TestsAchievement: Achievement() {
 
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
@@ -15,7 +17,7 @@ object Add10TestsAchievement: Achievement() {
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress(), 10, "You successfully added 10 tests", project)
+        handleProgress(progress(), 50, "You successfully added 50 tests", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
@@ -23,14 +25,11 @@ object Add10TestsAchievement: Achievement() {
     }
 
     override fun getName(): String {
-        return "They see me testing"
+        return "Limit Testing"
     }
 
     override fun getDescription(): String {
-        return "Write 10 tests"
+        return "Write 50 tests as a team"
     }
 
-    override fun requirementsMet(project: Project?): Boolean {
-        return true
-    }
 }

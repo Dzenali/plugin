@@ -31,7 +31,7 @@ object MutationsListener : BulkFileListener {
                 val project = event.file?.let { ProjectLocator.getInstance().guessProjectForFile(it) }
                 project!!.service<GamificationService>().sendUserMutantKilled(mutants.filter { it.status == "KILLED" })
                 for(achievement in getMutantAchievements()) {
-                    if(!achievement.isDone()) achievement.updateProgress(mutants, project)
+                    achievement.takeIf { !it.isDone() }?.updateProgress(mutants, project)
                 }
             }
         }

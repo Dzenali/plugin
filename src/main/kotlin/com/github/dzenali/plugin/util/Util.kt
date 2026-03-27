@@ -3,8 +3,16 @@ package com.github.dzenali.plugin.util
 import com.github.dzenali.plugin.MyBundle
 import com.github.dzenali.plugin.achievements.Achievement
 import com.github.dzenali.plugin.achievements.Add10TestsAchievement
+import com.github.dzenali.plugin.achievements.Add1TestAchievement
+import com.github.dzenali.plugin.achievements.Add50TestsAchievement
+import com.github.dzenali.plugin.achievements.CleanDragonAchievement
 import com.github.dzenali.plugin.achievements.Cover100LinesAchievement
+import com.github.dzenali.plugin.achievements.Cover10LinesAchievement
+import com.github.dzenali.plugin.achievements.Cover300LinesAchievement
 import com.github.dzenali.plugin.achievements.Kill10MutantsAchievement
+import com.github.dzenali.plugin.achievements.Kill1MutantAchievement
+import com.github.dzenali.plugin.achievements.Kill200MutantsAchievement
+import com.github.dzenali.plugin.achievements.Kill75MutantsAchievement
 import com.github.dzenali.plugin.achievements.KillAllMutantsAchievement
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -41,26 +49,67 @@ object Util{
 
     fun getAchievements(): List<Achievement> {
         return listOf(
-            Kill10MutantsAchievement,
-            Cover100LinesAchievement,
+            Add1TestAchievement,
             Add10TestsAchievement,
+            Add50TestsAchievement,
+            Kill1MutantAchievement,
+            Kill10MutantsAchievement,
+            Kill75MutantsAchievement,
+            Kill200MutantsAchievement,
+            Cover10LinesAchievement,
+            Cover100LinesAchievement,
+            Cover300LinesAchievement,
             KillAllMutantsAchievement,
+            CleanDragonAchievement,
+        )
+    }
 
+    fun getPersonalAchievements(): List<Achievement> {
+        return listOf(
+            Add1TestAchievement,
+            Add10TestsAchievement,
+            Kill1MutantAchievement,
+            Kill10MutantsAchievement,
+            Cover10LinesAchievement,
+            )
+    }
+
+    fun getTeamAchievements(): List<Achievement> {
+        return listOf(
+            Add50TestsAchievement,
+            Kill75MutantsAchievement,
+            Kill200MutantsAchievement,
+            Cover100LinesAchievement,
+            Cover300LinesAchievement,
+            KillAllMutantsAchievement,
+            CleanDragonAchievement,
+            )
+    }
+
+    fun getCoverageAchievements(): List<Achievement> {
+        return listOf(
+            Cover10LinesAchievement,
+            Cover100LinesAchievement,
+            Cover300LinesAchievement,
         )
     }
 
     fun getTestAchievements(): List<Achievement>{
         return listOf(
+            Add1TestAchievement,
             Add10TestsAchievement,
-
+            Add50TestsAchievement,
         )
     }
 
     fun getMutantAchievements(): List<Achievement>{
         return listOf(
+            Kill1MutantAchievement,
             Kill10MutantsAchievement,
+            Kill75MutantsAchievement,
+            Kill200MutantsAchievement,
             KillAllMutantsAchievement,
-
+            CleanDragonAchievement,
         )
     }
 
