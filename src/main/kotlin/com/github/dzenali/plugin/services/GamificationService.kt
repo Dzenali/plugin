@@ -48,7 +48,8 @@ class GamificationService(val project: Project) : Disposable {
     private var teamName = ""
     private var teamId = ""
     private var apiKey = ""
-    private var teamAchievementsUnlocked = false
+    private var teamAchievementsUnlocked: Boolean = false
+    private var teamAchievementsUnlockedT2: Boolean = false
     private val csvPath = Util.getEvaluationFilePath(project, "Actions.csv")
     private val actionCSV = CSVFile(listOf("Action", "Name", "GameMode", "Timestamp"))
     private var webSocketUrl = MyBundle.getMessage("websocketURL")
@@ -182,7 +183,6 @@ class GamificationService(val project: Project) : Disposable {
             || webSocketState == WebSocketState.INVALID_API_KEY) {
             connect()
         }
-        if(teamName != ""){joinTeam(teamName)}
     }
 
     fun disconnect() {
@@ -242,7 +242,9 @@ class GamificationService(val project: Project) : Disposable {
         return teamName
     }
 
-    fun getTeamAchievementUnlocked(): Boolean{return this.teamAchievementsUnlocked}
+    fun isTeamAchievementUnlocked(): Boolean {return this.teamAchievementsUnlocked}
+    fun isTeamAchievementT2Unlocked(): Boolean {return this.teamAchievementsUnlockedT2 }
+
 
     private fun setWebSocketState(state: WebSocketState) {
         Logger.logStatus("Web socket state : $state", Logger.Kind.Debug, project)
@@ -264,6 +266,7 @@ class GamificationService(val project: Project) : Disposable {
         teamId = ""
         properties.setValue("gamification-team-name", "")
         properties.setValue("gamification-team-id", "")
+        refresh()
     }
 
     private fun onReceiveMessage(message: String) {
@@ -329,7 +332,9 @@ class GamificationService(val project: Project) : Disposable {
 
     private fun onTeamAchievementsUnlocked(message: String) {
         val onTeamAchievementsUnlocked = gson.fromJson(message, OnTeamAchievementsUnlocked::class.java)
-        this.teamAchievementsUnlocked = onTeamAchievementsUnlocked.payload
+        val data = onTeamAchievementsUnlocked.payload
+        this.teamAchievementsUnlocked = data.t1
+        this.teamAchievementsUnlockedT2 = data.t2
 
         refresh()
     }
@@ -530,7 +535,6 @@ class GamificationService(val project: Project) : Disposable {
         val teamAchievementCommand = gson.fromJson(message, TeamAchievementCommand::class.java)
         val data = teamAchievementCommand.payload
         CleanDragonAchievement.updateProgress(data.dragon, project)
-
     }
 
     override fun dispose() = Unit

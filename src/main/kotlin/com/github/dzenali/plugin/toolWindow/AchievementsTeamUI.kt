@@ -4,9 +4,10 @@ import com.github.dzenali.plugin.achievements.Achievement
 import com.github.dzenali.plugin.components.AchievementIcons
 import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.services.GamificationService
-import com.github.dzenali.plugin.util.Util.getAchievements
 import com.github.dzenali.plugin.util.Util.getPersonalAchievements
-import com.github.dzenali.plugin.util.Util.getTeamAchievements
+import com.github.dzenali.plugin.util.Util.getTeamAchievementsT1
+import com.github.dzenali.plugin.util.Util.getTeamAchievementsT2
+import com.github.dzenali.plugin.util.WebSocketState
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -24,9 +25,15 @@ import javax.swing.Icon
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JProgressBar
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
 class AchievementsTeamUI {
     companion object {
+        private var usernameInputText: String = ""
+        private var searchInputText: String = ""
+
         fun create(project: Project): JPanel {
             val properties = PropertiesComponent.getInstance()
             val gamificationService = project.service<GamificationService>()
@@ -52,6 +59,17 @@ class AchievementsTeamUI {
                 panel.add(validateButton)
 
                 topPanel.add(panel)
+
+                val panelConnection = panel {
+                    row {
+                        button("Reconnect") {
+                            gamificationService.reconnect()
+                        }.align(AlignX.CENTER)
+                    }
+                }
+                if(!(gamificationService.getWebSocketState() == WebSocketState.CONNECTED || gamificationService.getWebSocketState() == WebSocketState.CONNECTING)) {
+                    topPanel.add(panelConnection)
+                }
 
                 teamPanel.add(topPanel, BorderLayout.NORTH)
 
@@ -83,20 +101,52 @@ class AchievementsTeamUI {
                             icon(getAchievementIcon(achievement))
                             label(achievement.getName()).align(AlignX.LEFT)
                             contextHelp(achievement.getDescription(), achievement.getName())
+                            val progressBar = JProgressBar(0, achievement.getTarget())
+                            progressBar.value = achievement.progress()
+                            progressBar.isStringPainted = false
+                            var label = achievement.progress().toString()
+                            label += " / " + achievement.getTarget()
+                            label(label)
+
                         }.resizableRow()
                     }
                 }
                 groupRowsRange("Team Achievements") {
-                    if(!gamificationService.getTeamAchievementUnlocked()) {
+                    if(!gamificationService.isTeamAchievementUnlocked()) {
                         row {
                             label("Some team member still need to kill 10 mutants").align(AlignX.LEFT)
                         }
                     } else {
-                        for (teamAchievement in getTeamAchievements()) {
+                        for (teamAchievement in getTeamAchievementsT1()) {
                             row {
                                 icon(getAchievementIcon(teamAchievement))
                                 label(teamAchievement.getName()).align(AlignX.LEFT)
                                 contextHelp(teamAchievement.getDescription(), teamAchievement.getName())
+                                val progressBar = JProgressBar(0, teamAchievement.getTarget())
+                                progressBar.value = teamAchievement.progress()
+                                progressBar.isStringPainted = false
+                                var label = teamAchievement.progress().toString()
+                                label += " / " + teamAchievement.getTarget()
+                                label(label)
+                            }
+                        }
+                        if(!gamificationService.isTeamAchievementT2Unlocked()){
+                            row {
+                                label("Some team member still need to do something").align(AlignX.LEFT)
+                            }
+                        } else {
+                            for(t in getTeamAchievementsT2()){
+                                row {
+                                    icon(getAchievementIcon(t))
+                                    label(t.getName()).align(AlignX.LEFT)
+                                    contextHelp(t.getDescription(), t.getName())
+                                    val progressBar = JProgressBar(0, t.getTarget())
+                                    progressBar.value = t.progress()
+                                    progressBar.isStringPainted = false
+                                    var label = t.progress().toString()
+                                    label += " / " + t.getTarget()
+                                    label(label)
+                                }
                             }
                         }
                     }
@@ -119,10 +169,48 @@ class AchievementsTeamUI {
             val gamificationService = project.service<GamificationService>()
             val panel = panel {
                 row {
+                    val isWebSocketConnected = gamificationService.getWebSocketState() == WebSocketState.CONNECTED || gamificationService.getWebSocketState() == WebSocketState.CONNECTING
+
+                    label("Username :").align(AlignX.LEFT)
+
+                    val textField = JBTextField().apply {
+                        text = usernameInputText.ifEmpty { gamificationService.getUsername() }
+                        isEnabled = isWebSocketConnected
+                    }
+                    cell(textField).align(AlignX.FILL).resizableColumn()
+
+                    val validateButton = JButton("Validate").apply {
+                        isEnabled = (
+                                usernameInputText.isNotBlank() &&
+                                        usernameInputText != gamificationService.getUsername() &&
+                                        isWebSocketConnected
+                                )
+                        addActionListener { gamificationService.setUsername(textField.text) }
+                    }
+                    cell(validateButton).align(AlignX.RIGHT)
+
+                    textField.document.addDocumentListener(object : DocumentListener {
+                        override fun insertUpdate(e: DocumentEvent?) = onTextChanged()
+                        override fun removeUpdate(e: DocumentEvent?) = onTextChanged()
+                        override fun changedUpdate(e: DocumentEvent?) {}
+
+                        private fun onTextChanged() {
+                            usernameInputText = textField.text.trim()
+                            validateButton.isEnabled = (
+                                    usernameInputText.isNotBlank() &&
+                                            usernameInputText != gamificationService.getUsername() &&
+                                            isWebSocketConnected
+                                    )
+                        }
+                    })
+                }
+                row {
                     label("Team: $teamName").align(AlignX.LEFT)
-                    button("Reconnect") {
-                        gamificationService.reconnect()
-                    }.align(AlignX.CENTER)
+                    if(gamificationService.getWebSocketState() == WebSocketState.DISCONNECTED) {
+                        button("Reconnect") {
+                            gamificationService.reconnect()
+                        }.align(AlignX.CENTER)
+                    }
                     button("LeaveTeam") {
                         gamificationService.leaveTeam()
                     }.align(AlignX.RIGHT)

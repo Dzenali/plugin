@@ -3,11 +3,8 @@ package com.github.dzenali.plugin.achievements
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.newvfs.BulkFileListener
 
-object Kill10MutantsAchievement : Achievement() {
-
-    //Returns min between 10 and mutants killed
+object Kill25MutantsAchievement: Achievement() {
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
         return minOf(properties.getInt(getPropertyKey(), 0), getTarget())
@@ -21,19 +18,19 @@ object Kill10MutantsAchievement : Achievement() {
         val nbMutants = mutants.filter { it.status == "KILLED" }.size
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), nbMutants, 0)
-        handleProgress(nbMutants, getTarget(), "10 mutants returned to primordial soup", project)
+        handleProgress(nbMutants, getTarget(), "25 mutants returned to primordial soup", project)
     }
 
     override fun getDescription(): String {
-        return "Kill 10 mutants"
+        return "Kill 25 mutants"
     }
 
     override fun getName(): String {
-        return "Mu-ten-ts"
+        return "Trim The Fat"
     }
 
     override fun getTarget(): Int {
-        return 10
+        return 25
     }
 
     override fun getTier(): Int {

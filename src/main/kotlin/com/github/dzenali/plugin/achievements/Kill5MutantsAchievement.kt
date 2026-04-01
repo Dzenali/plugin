@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project
 object Kill5MutantsAchievement: Achievement() {
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
-        return minOf(properties.getInt(getPropertyKey(), 0), 5)
+        return minOf(properties.getInt(getPropertyKey(), 0), getTarget())
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
@@ -18,7 +18,7 @@ object Kill5MutantsAchievement: Achievement() {
         val nbMutants = mutants.filter { it.status == "KILLED" }.size
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), nbMutants, 0)
-        handleProgress(nbMutants, 5, "5 mutants returned to primordial soup", project)
+        handleProgress(nbMutants, getTarget(), "5 mutants returned to primordial soup", project)
     }
 
     override fun getDescription(): String {
@@ -29,8 +29,12 @@ object Kill5MutantsAchievement: Achievement() {
         return "A Handful"
     }
 
-    override fun requirementsMet(project: Project?): Boolean {
-        return true
+    override fun getTarget(): Int {
+        return 5
+    }
+
+    override fun getTier(): Int {
+        return 0
     }
 
 }

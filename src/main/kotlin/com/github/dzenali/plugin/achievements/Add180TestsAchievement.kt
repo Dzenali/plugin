@@ -1,23 +1,19 @@
 package com.github.dzenali.plugin.achievements
 
-import com.github.dzenali.plugin.services.GamificationService
-import com.github.dzenali.plugin.util.GameMode
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.util.PropertiesComponent
-import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 
-object Add50TestsAchievement: Achievement() {
-
+object Add180TestsAchievement: Achievement() {
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
-        return minOf(properties.getInt(getPropertyKey(), 0), 10)
+        return minOf(properties.getInt(getPropertyKey(), 0), getTarget())
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress(), 50, "You successfully added 50 tests", project)
+        properties.setValue(getPropertyKey(), progress + progress(), 0)
+        handleProgress(progress(), getTarget(), "No More Ariane disaster", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
@@ -25,11 +21,19 @@ object Add50TestsAchievement: Achievement() {
     }
 
     override fun getName(): String {
-        return "Limit Testing"
+        return "No value type mismatch"
     }
 
     override fun getDescription(): String {
-        return "Write 50 tests as a team"
+        return "Write 180 tests as a team"
+    }
+
+    override fun getTarget(): Int {
+        return 180
+    }
+
+    override fun getTier(): Int {
+        return 1
     }
 
 }

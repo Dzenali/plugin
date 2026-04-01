@@ -10,13 +10,13 @@ import com.intellij.openapi.project.Project
 object CleanDragonAchievement: Achievement() {
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
-        return minOf(properties.getInt(getPropertyKey(), 0), 10)
+        return minOf(properties.getInt(getPropertyKey(), 0), getTarget())
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress, 11, "The dragon is relieved", project)
+        handleProgress(progress, getTarget(), "The dragon is relieved", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
@@ -34,6 +34,14 @@ object CleanDragonAchievement: Achievement() {
 
     override fun getName(): String {
         return "Morpions et dragons"
+    }
+
+    override fun getTarget(): Int {
+        return 11
+    }
+
+    override fun getTier(): Int {
+        return 1
     }
 
 }

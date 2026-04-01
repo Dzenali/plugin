@@ -1,11 +1,11 @@
 package com.github.dzenali.plugin.achievements
 
+import com.github.dzenali.plugin.util.CoverageInfo
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
-import com.github.dzenali.plugin.util.CoverageInfo
 
-object Cover100LinesAchievement: Achievement() {
+object Cover200LinesAchievement: Achievement() {
     fun triggerAchievement(coverageInfo: CoverageInfo, project: Project) {
         if(coverageInfo.coveredLineCount <= 0 || isDone()){
             return
@@ -16,12 +16,13 @@ object Cover100LinesAchievement: Achievement() {
     }
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
-        return minOf(properties.getInt(getPropertyKey(), 0), getTarget())    }
+        return minOf(properties.getInt(getPropertyKey(), 0), getTarget())
+    }
 
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress(), getTarget(), "You successfully covered 100 lines of code.", project)
+        handleProgress(progress(), getTarget(), "You successfully covered 200 lines of code.", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
@@ -29,19 +30,18 @@ object Cover100LinesAchievement: Achievement() {
     }
 
     override fun getName(): String {
-        return("Covering Fire")
+        return("Mr/Ms Worldwide")
     }
 
     override fun getDescription(): String {
-        return("Cover 100 or more lines of code with your tests (coverage must be active)")
+        return("Cover 200 or more lines of code with your tests (coverage must be active)")
     }
 
     override fun getTarget(): Int {
-        return 100
+        return 200
     }
 
     override fun getTier(): Int {
         return 0
     }
-
 }

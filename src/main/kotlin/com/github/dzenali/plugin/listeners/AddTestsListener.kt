@@ -45,6 +45,7 @@ object AddTestsListener : BulkFileListener {
     }
 
     override fun after(events: MutableList<out VFileEvent>) {
+        if(events.isEmpty()) return
 
         val project = events[0].file?.let { ProjectLocator.getInstance().guessProjectForFile(it) }
         for (event in events.filter { !Util.isTestExcluded(it.path) }) {
@@ -63,8 +64,8 @@ object AddTestsListener : BulkFileListener {
                 }
             }
         }
-        for(test in getTestAchievements()){
-            test.updateProgress(progress(),project)
+        for (test in getTestAchievements()) {
+            test.updateProgress(progress(), project)
         }
         super.after(events)
     }

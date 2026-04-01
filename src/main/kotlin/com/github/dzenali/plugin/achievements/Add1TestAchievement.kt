@@ -7,13 +7,13 @@ import com.intellij.openapi.project.Project
 object Add1TestAchievement: Achievement() {
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
-        return minOf(properties.getInt(getPropertyKey(), 0), 10)
+        return minOf(properties.getInt(getPropertyKey(), 0), getTarget())
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress(), 1, "You successfully added 1 test", project)
+        properties.setValue(getPropertyKey(), progress + progress(), 0)
+        handleProgress(progress(), getTarget(), "You successfully added 1 test", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
@@ -28,8 +28,12 @@ object Add1TestAchievement: Achievement() {
         return "Write 1 test"
     }
 
-    override fun requirementsMet(project: Project?): Boolean {
-        return true
+    override fun getTarget(): Int {
+        return 1
+    }
+
+    override fun getTier(): Int {
+        return 0
     }
 
 }

@@ -17,7 +17,6 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.content.ContentFactory
 import java.util.concurrent.TimeUnit
 import javax.swing.SwingUtilities
-import kotlin.reflect.KClass
 
 abstract class Achievement {
 
@@ -34,21 +33,25 @@ abstract class Achievement {
 
     fun handleProgress(current: Int, target: Int, message: String, project: Project?) {
         val properties = PropertiesComponent.getInstance()
-        if( current >= target && !isDone() && requirementsMet(project)){
+        if( current >= target && requirementsMet(project)){
+            if(!isDone()) {showAchievementNotification(message, project)}
             properties.setValue(getPropertyKey() + "status", "done")
-            showAchievementNotification(message, project)
             project?.service<GamificationService>()?.addAchievementDone(this::class)
         }
     }
 
-    open fun requirementsMet(project: Project?): Boolean {
+    abstract fun getTier(): Int
+
+    fun requirementsMet(project: Project?): Boolean {
         val gamificationService = project?.service<GamificationService>()
         val gameMode = gamificationService?.getGameMode()
-        val tierOk = gamificationService?.getTeamAchievementUnlocked()
-        if(gameMode == GameMode.SOLO || (gameMode == GameMode.TEAM && tierOk == true)) {
-            return true
-        } else {
-            return false
+        val tier = getTier()
+
+        return when(tier) {
+            0 -> true
+            1 -> gamificationService?.isTeamAchievementUnlocked() == true
+            2 -> gamificationService?.isTeamAchievementT2Unlocked() == true
+            else -> false
         }
     }
 
@@ -58,14 +61,14 @@ abstract class Achievement {
             message,
             NotificationType.INFORMATION
         )
-            .addAction(
+            /*.addAction(
                 NotificationAction.createSimple("Show more information") {
                     val myProject = DataManager.getInstance().dataContextFromFocusAsync.blockingGet(10, TimeUnit.SECONDS)!!.getData(
                         PlatformDataKeys.PROJECT)
                     val toolWindow = ToolWindowManager.getInstance(myProject!!).getToolWindow("Gamification")!!
                     toolWindow.show()
                 }
-            )
+            )*/
         refreshWindow()
         notification.notify(null)
         Logger.logStatus(message, Logger.Kind.Notification, project)
@@ -92,6 +95,8 @@ abstract class Achievement {
     open fun getPropertyKey(): String{
         return this::class.simpleName!!
     }
+
+    abstract fun getTarget(): Int
 
 
 }

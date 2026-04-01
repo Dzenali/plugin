@@ -3,40 +3,37 @@ package com.github.dzenali.plugin.achievements
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.newvfs.BulkFileListener
 
-object Kill10MutantsAchievement : Achievement() {
-
-    //Returns min between 10 and mutants killed
+object Add20TestsAchievement: Achievement() {
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
         return minOf(properties.getInt(getPropertyKey(), 0), getTarget())
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
-        TODO("Not yet implemented")
+        val properties = PropertiesComponent.getInstance()
+        properties.setValue(getPropertyKey(), progress + progress(), 0)
+        handleProgress(progress(), getTarget(), "You successfully added 20 tests", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
-        val nbMutants = mutants.filter { it.status == "KILLED" }.size
-        val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), nbMutants, 0)
-        handleProgress(nbMutants, getTarget(), "10 mutants returned to primordial soup", project)
-    }
-
-    override fun getDescription(): String {
-        return "Kill 10 mutants"
+        TODO("Feature Not yet implemented")
     }
 
     override fun getName(): String {
-        return "Mu-ten-ts"
+        return "Entering the twentest"
+    }
+
+    override fun getDescription(): String {
+        return "Write 20 tests"
     }
 
     override fun getTarget(): Int {
-        return 10
+        return 20
     }
 
     override fun getTier(): Int {
         return 0
     }
+
 }

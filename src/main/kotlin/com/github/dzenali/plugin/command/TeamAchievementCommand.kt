@@ -5,4 +5,5 @@ data class TeamAchievementCommand(
     var payload: TeamAchievementCommandData
 )
 
-data class TeamAchievementCommandData(var dragon: Int)
+data class TeamAchievementCommandData(
+    var dragon: Int)

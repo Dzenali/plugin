@@ -61,8 +61,11 @@ object CoverageListener: CoverageSuiteListener {
                 for ((key, value) in classCoverageInfosValue.filter { (it.key as String).contains(runClassName)  && !Util.isTestExcluded(it.key as String) }) {
                     val coverageInfo = extractCoverageInfos(value)
                     Cover10LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
+                    Cover33LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
                     Cover100LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
+                    Cover200LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
                     Cover300LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
+                    Cover600LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
                     gamificationService.updateCoverage(coverageInfo, key as String, testRunName, project)
                 }
 

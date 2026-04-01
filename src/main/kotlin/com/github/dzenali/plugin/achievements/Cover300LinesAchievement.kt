@@ -16,13 +16,13 @@ object Cover300LinesAchievement: Achievement() {
     }
     override fun progress(): Int {
         val properties = PropertiesComponent.getInstance()
-        return properties.getInt(getPropertyKey(), 0)
+        return minOf(properties.getInt(getPropertyKey(), 0), getTarget())
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress(), 300, "You successfully covered 300 lines of code.", project)
+        handleProgress(progress(), getTarget(), "You successfully covered 300 lines of code.", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
@@ -35,6 +35,14 @@ object Cover300LinesAchievement: Achievement() {
 
     override fun getDescription(): String {
         return("Cover 300 or more lines of code with your tests (coverage must be active)")
+    }
+
+    override fun getTarget(): Int {
+        return 300
+    }
+
+    override fun getTier(): Int {
+        return 1
     }
 
 }

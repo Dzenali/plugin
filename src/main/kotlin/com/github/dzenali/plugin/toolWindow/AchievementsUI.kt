@@ -4,6 +4,8 @@ import com.github.dzenali.plugin.achievements.Achievement
 import com.github.dzenali.plugin.components.AchievementIcons
 import com.github.dzenali.plugin.services.GamificationService
 import com.github.dzenali.plugin.util.Util.getAchievements
+import com.github.dzenali.plugin.util.Util.getSoloAchievements
+import com.github.dzenali.plugin.util.WebSocketState
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBScrollPane
@@ -14,6 +16,7 @@ import java.awt.Component
 import javax.swing.BorderFactory
 import javax.swing.Icon
 import javax.swing.JPanel
+import javax.swing.JProgressBar
 
 class AchievementsUI {
     companion object {
@@ -34,17 +37,25 @@ class AchievementsUI {
 
         private fun achievementList(gamificationService: GamificationService): JPanel {
             val panel = panel {
-                row {
+                if(!(gamificationService.getWebSocketState() == WebSocketState.CONNECTED || gamificationService.getWebSocketState() == WebSocketState.CONNECTING)) {
+                    row {
                         button("Reconnect") {
                             gamificationService.reconnect()
                         }.align(AlignX.CENTER)
                     }
+                }
                 groupRowsRange("Achievements") {
-                    for (achievement in getAchievements()) {
+                    for (achievement in getSoloAchievements()) {
                         row{
                             icon(getAchievementIcon(achievement))
                             label(achievement.getName()).align(AlignX.LEFT)
                             contextHelp(achievement.getDescription(), achievement.getName())
+                            val progressBar = JProgressBar(0, achievement.getTarget())
+                            progressBar.value = achievement.progress()
+                            progressBar.isStringPainted = false
+                            var label = achievement.progress().toString()
+                            label += " / " + achievement.getTarget()
+                            label(label)
                         }.resizableRow()
                     }
                 }
