@@ -6,7 +6,7 @@ import javax.swing.Icon
 
 object AchievementIcons {
     private val iconMap: Map<String, Icon> = mapOf(
-        "Kill1MutantsAchievement" to IconLoader.getIcon("/icons/Kill1MutantsAchievementIcon.png", javaClass),
+        "Kill1MutantsAchievement" to IconLoader.getIcon("/icons/Kill1MutantAchievementIcon.png", javaClass),
         "Kill5MutantsAchievement" to IconLoader.getIcon("/icons/Kill5MutantsAchievementIcon.png", javaClass),
         "Kill10MutantsAchievement" to IconLoader.getIcon("/icons/Kill10MutantsAchievementIcon.png", javaClass),
         "Kill25MutantsAchievement" to IconLoader.getIcon("/icons/Kill75MutantsAchievementIcon.png", javaClass),

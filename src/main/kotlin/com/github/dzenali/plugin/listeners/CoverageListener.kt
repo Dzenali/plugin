@@ -64,8 +64,6 @@ object CoverageListener: CoverageSuiteListener {
                     Cover33LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
                     Cover100LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
                     Cover200LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
-                    Cover300LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
-                    Cover600LinesAchievement.takeIf { !it.isDone() }?.triggerAchievement(coverageInfo, project)
                     gamificationService.updateCoverage(coverageInfo, key as String, testRunName, project)
                 }
 

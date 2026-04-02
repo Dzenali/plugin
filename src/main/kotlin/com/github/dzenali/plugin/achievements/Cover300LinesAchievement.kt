@@ -22,7 +22,7 @@ object Cover300LinesAchievement: Achievement() {
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
         properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress(), getTarget(), "You successfully covered 300 lines of code.", project)
+        handleProgress(progress(), getTarget(), "Your team successfully covered 300 lines of code.", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {

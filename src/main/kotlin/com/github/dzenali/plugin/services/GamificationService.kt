@@ -16,6 +16,12 @@ import com.intellij.ui.content.ContentFactory
 import com.github.dzenali.plugin.MyBundle
 import com.github.dzenali.plugin.achievements.Achievement
 import com.github.dzenali.plugin.achievements.CleanDragonAchievement
+import com.github.dzenali.plugin.achievements.Cover100LinesAchievement
+import com.github.dzenali.plugin.achievements.Cover10LinesAchievement
+import com.github.dzenali.plugin.achievements.Cover200LinesAchievement
+import com.github.dzenali.plugin.achievements.Cover300LinesAchievement
+import com.github.dzenali.plugin.achievements.Cover33LinesAchievement
+import com.github.dzenali.plugin.achievements.Cover600LinesAchievement
 import com.github.dzenali.plugin.command.*
 import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.toolWindow.WindowPanel
@@ -281,6 +287,8 @@ class GamificationService(val project: Project) : Disposable {
             "leaveTeam" -> onTeamLeft()
             "onTeamAchievementsUnlocked" -> onTeamAchievementsUnlocked(message)
             "TeamAchievementsProgress" -> teamAchievementProgress(message)
+            "onCoverageUpdated" -> onCoverageUpdated(message)
+            "onTeamCoverageUpdated" -> onTeamCoverageUpdate(message)
         }
     }
 
@@ -325,7 +333,6 @@ class GamificationService(val project: Project) : Disposable {
     private fun onUserActivityUpdated(message: String) {
         val onUserActivityUpdatedCommand = gson.fromJson(message, OnUserActivityUpdatedCommand::class.java)
         val data = onUserActivityUpdatedCommand.payload
-        val user = data.user
 
         refresh()
     }
@@ -349,6 +356,23 @@ class GamificationService(val project: Project) : Disposable {
         }
 
         Team.updateUser(user)
+        refresh()
+    }
+
+    private fun onCoverageUpdated(message: String) {
+        val onCoverageUpdateCommand = gson.fromJson(message, OnCoverageUpdateCommand::class.java)
+        val coveredLines = onCoverageUpdateCommand.payload.toInt()
+        Cover10LinesAchievement.updateProgress(coveredLines, project)
+        Cover33LinesAchievement.updateProgress(coveredLines, project)
+        Cover100LinesAchievement.updateProgress(coveredLines, project)
+        Cover200LinesAchievement.updateProgress(coveredLines, project)
+    }
+
+    private fun onTeamCoverageUpdate(message: String) {
+        val onCoverageUpdateCommand = gson.fromJson(message, OnCoverageUpdateCommand::class.java)
+        val coveredLines = onCoverageUpdateCommand.payload.toInt()
+        Cover300LinesAchievement.updateProgress(coveredLines, project)
+        Cover600LinesAchievement.updateProgress(coveredLines, project)
         refresh()
     }
 
