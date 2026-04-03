@@ -15,6 +15,7 @@ import com.intellij.ui.EditorNotifications
 import com.intellij.ui.content.ContentFactory
 import com.github.dzenali.plugin.MyBundle
 import com.github.dzenali.plugin.achievements.Achievement
+import com.github.dzenali.plugin.achievements.CleanAllArchetypeAchievement
 import com.github.dzenali.plugin.achievements.CleanDragonAchievement
 import com.github.dzenali.plugin.achievements.Cover100LinesAchievement
 import com.github.dzenali.plugin.achievements.Cover10LinesAchievement
@@ -22,6 +23,7 @@ import com.github.dzenali.plugin.achievements.Cover200LinesAchievement
 import com.github.dzenali.plugin.achievements.Cover300LinesAchievement
 import com.github.dzenali.plugin.achievements.Cover33LinesAchievement
 import com.github.dzenali.plugin.achievements.Cover600LinesAchievement
+import com.github.dzenali.plugin.achievements.Kill200MutantsAchievement
 import com.github.dzenali.plugin.command.*
 import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.toolWindow.WindowPanel
@@ -289,6 +291,7 @@ class GamificationService(val project: Project) : Disposable {
             "TeamAchievementsProgress" -> teamAchievementProgress(message)
             "onCoverageUpdated" -> onCoverageUpdated(message)
             "onTeamCoverageUpdated" -> onTeamCoverageUpdate(message)
+            "onTeamMutantsKilledUpdated" -> teamMutantsKilledProgress(message)
         }
     }
 
@@ -559,6 +562,13 @@ class GamificationService(val project: Project) : Disposable {
         val teamAchievementCommand = gson.fromJson(message, TeamAchievementCommand::class.java)
         val data = teamAchievementCommand.payload
         CleanDragonAchievement.updateProgress(data.dragon, project)
+        CleanAllArchetypeAchievement.updateProgress(data.archetype, project)
+    }
+
+    fun teamMutantsKilledProgress(message: String) {
+        val onCoverageUpdateCommand = gson.fromJson(message, OnCoverageUpdateCommand::class.java)
+        val nbMutantsKilled = onCoverageUpdateCommand.payload.toInt()
+        Kill200MutantsAchievement.updateProgress(nbMutantsKilled, project)
     }
 
     override fun dispose() = Unit

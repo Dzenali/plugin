@@ -30,7 +30,7 @@ object KillAllMutantsAchievement : Achievement() {
     }
 
     override fun getTarget(): Int {
-        return 321
+        return 297
     }
 
     override fun getTier(): Int {

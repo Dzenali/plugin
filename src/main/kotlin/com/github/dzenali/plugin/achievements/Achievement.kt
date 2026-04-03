@@ -7,7 +7,6 @@ import com.github.dzenali.plugin.util.Logger
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.DataManager
 import com.intellij.ide.util.PropertiesComponent
-import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.PlatformDataKeys
@@ -33,7 +32,10 @@ abstract class Achievement {
 
     fun handleProgress(current: Int, target: Int, message: String, project: Project?) {
         val properties = PropertiesComponent.getInstance()
-        if( current >= target && requirementsMet(project)){
+        val gamificationService = project?.service<GamificationService>()
+        if( current >= target
+            && (requirementsMet(gamificationService)
+                    || gamificationService?.getGameMode() == GameMode.SOLO)){
             if(!isDone()) {showAchievementNotification(message, project)}
             properties.setValue(getPropertyKey() + "status", "done")
             project?.service<GamificationService>()?.addAchievementDone(this::class)
@@ -42,8 +44,7 @@ abstract class Achievement {
 
     abstract fun getTier(): Int
 
-    fun requirementsMet(project: Project?): Boolean {
-        val gamificationService = project?.service<GamificationService>()
+    fun requirementsMet(gamificationService: GamificationService?): Boolean {
         val gameMode = gamificationService?.getGameMode()
         val tier = getTier()
 

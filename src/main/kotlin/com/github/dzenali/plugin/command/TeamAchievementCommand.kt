@@ -6,4 +6,5 @@ data class TeamAchievementCommand(
 )
 
 data class TeamAchievementCommandData(
-    var dragon: Int)
+    var dragon: Int,
+    var archetype: Int)

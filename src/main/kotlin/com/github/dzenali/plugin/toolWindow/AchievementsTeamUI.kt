@@ -96,7 +96,7 @@ class AchievementsTeamUI {
         private fun achievementList(gamificationService: GamificationService): JPanel {
             val panel = panel {
                 groupRowsRange("Personal Achievements") {
-                    for (achievement in getPersonalAchievements()) {
+                    for (achievement in getPersonalAchievements().filter { it.requirementsMet(gamificationService) }) {
                         row{
                             icon(getAchievementIcon(achievement))
                             label(achievement.getName()).align(AlignX.LEFT)
@@ -117,7 +117,7 @@ class AchievementsTeamUI {
                             label("Some team member still need to kill 10 mutants").align(AlignX.LEFT)
                         }
                     } else {
-                        for (teamAchievement in getTeamAchievementsT1()) {
+                        for (teamAchievement in getTeamAchievementsT1().filter { it.requirementsMet(gamificationService) }) {
                             row {
                                 icon(getAchievementIcon(teamAchievement))
                                 label(teamAchievement.getName()).align(AlignX.LEFT)
@@ -132,7 +132,7 @@ class AchievementsTeamUI {
                         }
                         if(!gamificationService.isTeamAchievementT2Unlocked()){
                             row {
-                                label("Some team member still need to do something").align(AlignX.LEFT)
+                                label("Some team member still need to kill at least 50 mutants").align(AlignX.LEFT)
                             }
                         } else {
                             for(t in getTeamAchievementsT2()){
@@ -154,8 +154,6 @@ class AchievementsTeamUI {
             }
             return panel
         }
-
-
 
         private fun getAchievementIcon(achievement: Achievement): Icon {
             return if (!achievement.isDone()) {

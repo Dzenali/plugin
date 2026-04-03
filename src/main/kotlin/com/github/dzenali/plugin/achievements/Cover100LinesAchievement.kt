@@ -41,7 +41,7 @@ object Cover100LinesAchievement: Achievement() {
     }
 
     override fun getTier(): Int {
-        return 0
+        return 1
     }
 
 }

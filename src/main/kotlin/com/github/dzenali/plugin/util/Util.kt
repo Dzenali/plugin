@@ -109,15 +109,15 @@ object Util{
             Kill5MutantsAchievement,
             Kill10MutantsAchievement,
             Cover10LinesAchievement,
+            Kill75MutantsAchievement,
+            Cover100LinesAchievement,
             )
     }
 
     fun getTeamAchievementsT1(): List<Achievement> {
         return listOf(
             Add60TestsAchievement,
-            Kill75MutantsAchievement,
             Kill200MutantsAchievement,
-            Cover100LinesAchievement,
             Cover300LinesAchievement,
             CleanDragonAchievement,
             )
@@ -161,7 +161,7 @@ object Util{
             Kill25MutantsAchievement,
             Kill66MutantsAchievement,
             Kill75MutantsAchievement,
-            Kill200MutantsAchievement,
+            //Kill200MutantsAchievement,
             KillAllMutantsAchievement,
             CleanDragonAchievement,
         )

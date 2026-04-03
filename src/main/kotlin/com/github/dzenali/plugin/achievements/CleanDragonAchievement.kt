@@ -14,9 +14,11 @@ object CleanDragonAchievement: Achievement() {
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
-        val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress, getTarget(), "The dragon is relieved", project)
+        if(project?.service<GamificationService>()?.getGameMode() == GameMode.SOLO) {
+            val properties = PropertiesComponent.getInstance()
+            properties.setValue(getPropertyKey(), progress, 0)
+            handleProgress(progress, getTarget(), "The dragon is relieved", project)
+        }
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
@@ -24,7 +26,7 @@ object CleanDragonAchievement: Achievement() {
             val nbMutants = mutants.filter { it.status == "KILLED" && it.sourceFile == "Dragon.java" }.size
             val properties = PropertiesComponent.getInstance()
             properties.setValue(getPropertyKey(), nbMutants, 0)
-            handleProgress(nbMutants, 11, "The dragon is relieved", project)
+            handleProgress(nbMutants, getTarget(), "The dragon is relieved", project)
         }
     }
 
@@ -37,7 +39,7 @@ object CleanDragonAchievement: Achievement() {
     }
 
     override fun getTarget(): Int {
-        return 11
+        return 10
     }
 
     override fun getTier(): Int {
