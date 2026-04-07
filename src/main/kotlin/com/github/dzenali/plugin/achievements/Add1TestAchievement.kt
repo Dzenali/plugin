@@ -12,8 +12,8 @@ object Add1TestAchievement: Achievement() {
 
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), progress + progress(), 0)
-        handleProgress(progress(), getTarget(), "You successfully added 1 test", project)
+        properties.setValue(getPropertyKey(), progress, 0)
+        if(!isDone()) handleProgress(progress(), getTarget(), "You successfully added 1 test", project)
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {

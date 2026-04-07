@@ -14,7 +14,7 @@ object CleanDragonAchievement: Achievement() {
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
-        if(project?.service<GamificationService>()?.getGameMode() == GameMode.SOLO) {
+        if(project?.service<GamificationService>()?.getGameMode() == GameMode.TEAM) {
             val properties = PropertiesComponent.getInstance()
             properties.setValue(getPropertyKey(), progress, 0)
             handleProgress(progress, getTarget(), "The dragon is relieved", project)

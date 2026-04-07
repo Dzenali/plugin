@@ -24,6 +24,8 @@ import com.github.dzenali.plugin.achievements.Cover300LinesAchievement
 import com.github.dzenali.plugin.achievements.Cover33LinesAchievement
 import com.github.dzenali.plugin.achievements.Cover600LinesAchievement
 import com.github.dzenali.plugin.achievements.Kill200MutantsAchievement
+import com.github.dzenali.plugin.achievements.KillAllMutantsAchievement
+import com.github.dzenali.plugin.achievements.TeamMember60TestsAchievement
 import com.github.dzenali.plugin.command.*
 import com.github.dzenali.plugin.components.Team
 import com.github.dzenali.plugin.toolWindow.WindowPanel
@@ -563,12 +565,19 @@ class GamificationService(val project: Project) : Disposable {
         val data = teamAchievementCommand.payload
         CleanDragonAchievement.updateProgress(data.dragon, project)
         CleanAllArchetypeAchievement.updateProgress(data.archetype, project)
+        if(data.each60tests) TeamMember60TestsAchievement.updateProgress(1, project)
     }
 
     fun teamMutantsKilledProgress(message: String) {
-        val onCoverageUpdateCommand = gson.fromJson(message, OnCoverageUpdateCommand::class.java)
-        val nbMutantsKilled = onCoverageUpdateCommand.payload.toInt()
-        Kill200MutantsAchievement.updateProgress(nbMutantsKilled, project)
+        if(!message.isBlank()){
+            val onCoverageUpdateCommand = gson.fromJson(message, OnCoverageUpdateCommand::class.java)
+            val nbMutantsKilled = onCoverageUpdateCommand.payload.toInt()
+            Kill200MutantsAchievement.updateProgress(nbMutantsKilled, project)
+            KillAllMutantsAchievement.updateProgress(nbMutantsKilled, project)
+        } else {
+            Logger.logStatus("Empty message on teamMutantsKilledProgress", Logger.Kind.Debug,project)
+        }
+
     }
 
     override fun dispose() = Unit

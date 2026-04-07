@@ -14,14 +14,20 @@ object Kill200MutantsAchievement: Achievement() {
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
-        TODO("Not yet implemented")
+        if(project?.service<GamificationService>()?.getGameMode() == GameMode.TEAM) {
+            val properties = PropertiesComponent.getInstance()
+            properties.setValue(getPropertyKey(), progress, 0)
+            handleProgress(progress, getTarget(), "You made a fine soup with your team", project)
+        }
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
-        val nbMutants = mutants.filter { it.status == "KILLED" }.size
-        val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), nbMutants, 0)
-        handleProgress(nbMutants, getTarget(), "200 mutants returned to primordial soup", project)
+        if(project?.service<GamificationService>()?.getGameMode() == GameMode.SOLO) {
+            val nbMutants = mutants.filter { it.status == "KILLED" }.size
+            val properties = PropertiesComponent.getInstance()
+            properties.setValue(getPropertyKey(), nbMutants, 0)
+            handleProgress(nbMutants, getTarget(), "You made a fine soup", project)
+        }
     }
 
     override fun getDescription(): String {

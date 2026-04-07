@@ -9,13 +9,15 @@ import com.intellij.openapi.project.Project
 
 object CleanAllArchetypeAchievement: Achievement() {
     override fun progress(): Int {
-        TODO("Not yet implemented")
-    }
+        val properties = PropertiesComponent.getInstance()
+        return minOf(properties.getInt(getPropertyKey(), 0), getTarget())    }
 
     override fun updateProgress(progress: Int, project: Project?) {
-        val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), progress, 0)
-        handleProgress(progress, getTarget(), "No more bedbugs during nighttime", project)
+        if(project?.service<GamificationService>()?.getGameMode() == GameMode.TEAM) {
+            val properties = PropertiesComponent.getInstance()
+            properties.setValue(getPropertyKey(), progress, 0)
+            handleProgress(progress, getTarget(), "No more bedbugs during nighttime", project)
+        }
     }
 
     override fun updateProgress(

@@ -1,7 +1,10 @@
 package com.github.dzenali.plugin.achievements
 
+import com.github.dzenali.plugin.services.GamificationService
+import com.github.dzenali.plugin.util.GameMode
 import com.github.dzenali.plugin.util.Mutation
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 
 object KillAllMutantsAchievement : Achievement() {
@@ -11,14 +14,20 @@ object KillAllMutantsAchievement : Achievement() {
     }
 
     override fun updateProgress(progress: Int, project: Project?) {
-        TODO("Not yet implemented")
+        if(project?.service<GamificationService>()?.getGameMode() == GameMode.TEAM) {
+            val properties = PropertiesComponent.getInstance()
+            properties.setValue(getPropertyKey(), progress + progress(), 0)
+            handleProgress(progress(), getTarget(), "You killed all mutants, proving evolution is a myth.", project)
+        }
     }
 
     override fun updateProgress(mutants: List<Mutation>, project: Project?) {
-        val nbMutants = mutants.filter { it.status == "KILLED" }.size
-        val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), nbMutants, 0)
-        handleProgress(nbMutants, mutants.size, "You killed all mutants, proving evolution is a myth.", project)
+        if(project?.service<GamificationService>()?.getGameMode() == GameMode.SOLO) {
+            val nbMutants = mutants.filter { it.status == "KILLED" }.size
+            val properties = PropertiesComponent.getInstance()
+            properties.setValue(getPropertyKey(), nbMutants, 0)
+            handleProgress(nbMutants, mutants.size, "You killed all mutants, proving evolution is a myth.", project)
+        }
     }
 
     override fun getName(): String {

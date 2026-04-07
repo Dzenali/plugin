@@ -12,7 +12,7 @@ object Add180TestsAchievement: Achievement() {
 
     override fun updateProgress(progress: Int, project: Project?) {
         val properties = PropertiesComponent.getInstance()
-        properties.setValue(getPropertyKey(), progress + progress(), 0)
+        properties.setValue(getPropertyKey(), progress, 0)
         handleProgress(progress(), getTarget(), "No More Ariane disaster", project)
     }
 

@@ -23,6 +23,7 @@ import com.github.dzenali.plugin.achievements.Kill5MutantsAchievement
 import com.github.dzenali.plugin.achievements.Kill66MutantsAchievement
 import com.github.dzenali.plugin.achievements.Kill75MutantsAchievement
 import com.github.dzenali.plugin.achievements.KillAllMutantsAchievement
+import com.github.dzenali.plugin.achievements.TeamMember60TestsAchievement
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import java.io.File
@@ -96,7 +97,8 @@ object Util{
             Cover10LinesAchievement,
             Cover33LinesAchievement,
             Cover100LinesAchievement,
-            //CleanAllArchetypeAchievement,
+            CleanDragonAchievement,
+            CleanAllArchetypeAchievement,
         )
     }
 
@@ -105,18 +107,19 @@ object Util{
             Add1TestAchievement,
             Add10TestsAchievement,
             Add20TestsAchievement,
+            Add60TestsAchievement,
             Kill1MutantAchievement,
             Kill5MutantsAchievement,
             Kill10MutantsAchievement,
+            Kill66MutantsAchievement,
             Cover10LinesAchievement,
-            Kill75MutantsAchievement,
+            Cover33LinesAchievement,
             Cover100LinesAchievement,
             )
     }
 
     fun getTeamAchievementsT1(): List<Achievement> {
         return listOf(
-            Add60TestsAchievement,
             Kill200MutantsAchievement,
             Cover300LinesAchievement,
             CleanDragonAchievement,
@@ -125,9 +128,9 @@ object Util{
 
     fun getTeamAchievementsT2(): List<Achievement> {
         return listOf(
-            Add180TestsAchievement,
+            TeamMember60TestsAchievement,
             Cover600LinesAchievement,
-            //CleanAllArchetypeAchievement,
+            CleanAllArchetypeAchievement,
             KillAllMutantsAchievement,
         )
     }
@@ -148,8 +151,7 @@ object Util{
             Add1TestAchievement,
             Add20TestsAchievement,
             Add10TestsAchievement,
-            Add60TestsAchievement,
-            Add180TestsAchievement
+            Add60TestsAchievement
         )
     }
 
@@ -161,7 +163,6 @@ object Util{
             Kill25MutantsAchievement,
             Kill66MutantsAchievement,
             Kill75MutantsAchievement,
-            //Kill200MutantsAchievement,
             KillAllMutantsAchievement,
             CleanDragonAchievement,
         )
