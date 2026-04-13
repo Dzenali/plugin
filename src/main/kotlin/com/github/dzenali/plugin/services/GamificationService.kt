@@ -50,9 +50,7 @@ class GamificationService(val project: Project) : Disposable {
     private lateinit var webSocketClient: WebSocket
     private var webSocketState = WebSocketState.DISCONNECTED
     private val properties = PropertiesComponent.getInstance()
-    private var gameMode: GameMode = GameMode.valueOf(
-        properties.getValue("gamification-game-mode", GameMode.SOLO.name)
-    )
+    private var gameMode: GameMode = GameMode.SOLO
     private var userId = ""
     private var username = ""
     private var teamName = ""
@@ -442,11 +440,11 @@ class GamificationService(val project: Project) : Disposable {
                 )
             )
         )
-        val instance = achievementClass.objectInstance!!
+
         actionCSV.appendLine(
             listOf(
                 className,
-                instance.getName(),
+                className,
                 gameMode.name,
                 Timestamp(System.currentTimeMillis()).toString()
             )
@@ -530,7 +528,7 @@ class GamificationService(val project: Project) : Disposable {
             if(response.code == 200) {
                 showNotification("File successfully sent, thanks for your help ! \uD83D\uDE09")
             }else{
-                showNotification("Error occurred while trying to send files - ${response.code} | ${response.body.string()}")
+                showNotification("Error occurred while trying to send files - ${response.code} | ${response.body?.string()}")
             }
 
             if(callback != null){

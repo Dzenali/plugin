@@ -6,7 +6,6 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTabbedPane
-import de.uni_passau.fim.se2.intelligame.components.SettingsUI
 import javax.swing.JComponent
 
 class WindowPanel(val project: Project): JBTabbedPane() {

@@ -1,4 +1,4 @@
-﻿package de.uni_passau.fim.se2.intelligame.components
+﻿package com.github.dzenali.plugin.toolWindow
 
 import com.github.dzenali.plugin.services.GamificationService
 import com.intellij.icons.AllIcons
@@ -16,19 +16,27 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
 import javax.swing.*
+import com.intellij.ui.CheckboxTreeBase.CheckPolicy
 import javax.swing.tree.DefaultTreeModel
 
 
 class CheckboxTreeRenderer : CheckboxTree.CheckboxTreeCellRenderer() {
-    override fun customizeRenderer(tree: JTree?, value: Any?, selected: Boolean, expanded: Boolean, leaf: Boolean, row: Int, hasFocus: Boolean) {
+    override fun customizeRenderer(
+        tree: JTree,
+        value: Any,
+        selected: Boolean,
+        expanded: Boolean,
+        leaf: Boolean,
+        row: Int,
+        hasFocus: Boolean
+    ) {
         super.customizeRenderer(tree, value, selected, expanded, leaf, row, hasFocus)
 
         if (value is CheckedTreeNode) {
             val userObject = value.userObject
-            if (userObject is File) {
-                textRenderer.append(userObject.name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
-            }else if (userObject is String) {
-                textRenderer.append(userObject, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+            when (userObject) {
+                is File -> textRenderer.append(userObject.name, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                is String -> textRenderer.append(userObject, SimpleTextAttributes.REGULAR_ATTRIBUTES)
             }
         }
     }
@@ -91,9 +99,13 @@ class SettingsUI {
 
             val checkboxTreeListener = CustomCheckboxTreeListener()
 
-            val tree = CheckboxTree(CheckboxTreeRenderer(), root)
-            tree.addCheckboxTreeListener(checkboxTreeListener)
+            val tree = CheckboxTree(
+                CheckboxTreeRenderer(),
+                root,
+                CheckPolicy(true, true, true, true)
+            )
 
+            tree.addCheckboxTreeListener(checkboxTreeListener)
             tree.border = BorderFactory.createEmptyBorder(0, 0, 15, 0)
             tree.isRootVisible = true
 
@@ -132,7 +144,7 @@ class SettingsUI {
 
             tree.addMouseListener(mouseAdapter)
 
-            dumpDataPanel.add(tree, BorderLayout.NORTH)
+            dumpDataPanel.add(tree, BorderLayout.CENTER)
 
             val sendFilesPanel = JPanel()
             sendFilesPanel.layout = BoxLayout(sendFilesPanel, BoxLayout.PAGE_AXIS)
@@ -214,13 +226,18 @@ class SettingsUI {
 
         private fun getCheckedTree(project: Project): Pair<CheckedTreeNode, List<File>> {
             val directory = Util.getEvaluationDirectoryPath(project)
+
+            if (directory.isBlank() || !File(directory).exists()) {
+                val root = CheckedTreeNode("No valid directory")
+                return Pair(root, emptyList())
+            }
+
             val root = CheckedTreeNode(directory)
 
             val files = getFiles(directory)
-            for(file in files){
+            for (file in files) {
                 val checkedTreeNode = CheckedTreeNode(file)
                 checkedTreeNode.isChecked = true
-
                 root.add(checkedTreeNode)
             }
 
