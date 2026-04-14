@@ -16,7 +16,7 @@ object KillAllMutantsAchievement : Achievement() {
     override fun updateProgress(progress: Int, project: Project?) {
         if(project?.service<GamificationService>()?.getGameMode() == GameMode.TEAM) {
             val properties = PropertiesComponent.getInstance()
-            properties.setValue(getPropertyKey(), progress + progress(), 0)
+            properties.setValue(getPropertyKey(), progress, 0)
             handleProgress(progress(), getTarget(), "You killed all mutants, proving evolution is a myth.", project)
         }
     }

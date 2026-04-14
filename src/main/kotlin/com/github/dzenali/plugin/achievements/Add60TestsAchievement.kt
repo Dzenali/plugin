@@ -29,7 +29,7 @@ object Add60TestsAchievement: Achievement() {
     }
 
     override fun getDescription(): String {
-        return "Write 60 tests as a team"
+        return "Write 60 tests"
     }
 
     override fun getTarget(): Int {

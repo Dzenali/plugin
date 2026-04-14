@@ -9,7 +9,7 @@ import com.intellij.ide.util.PropertiesComponent
 import java.io.File
 
 object AddTestsListener : BulkFileListener {
-    private var filesUnderObservation = hashMapOf<String, Int>()
+    private var filesUnderObservation = java.util.concurrent.ConcurrentHashMap<String, Int>()
     private val regex = "/\\*(?:[^*]|\\*+[^*/])*\\*+/|//.*".toRegex()
 
     fun progress(): Int {
@@ -28,12 +28,13 @@ object AddTestsListener : BulkFileListener {
 
     override fun before(events: MutableList<out VFileEvent>) {
         for (event in events.filter { !Util.isTestExcluded(it.path) }) {
-            val file = File(event.path)
+            val vfile = event.file ?: continue
+            val file = File(vfile.path)
 
             if (file.exists()) {
                 var counter = 0
 
-                if (event.path.endsWith("Test.java")) {
+                if (event.file?.name?.endsWith("Test.java") == true) {
                     counter = countTests(file.readText().replace(regex, ""))
                 }
 

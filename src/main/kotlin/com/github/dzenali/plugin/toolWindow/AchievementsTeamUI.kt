@@ -55,7 +55,7 @@ class AchievementsTeamUI {
                 panel.add(textField)
 
                 val validateButton = JButton("Validate")
-                validateButton.addActionListener {gamificationService.joinTeam(textField.text)}
+                validateButton.addActionListener { gamificationService.joinTeam(textField.text) }
                 panel.add(validateButton)
 
                 topPanel.add(panel)

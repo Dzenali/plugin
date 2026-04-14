@@ -25,9 +25,10 @@ object MutationsListener : BulkFileListener {
     override fun after(events: MutableList<out VFileEvent>) {
         val event = events.firstOrNull { it.path.endsWith("mutations.xml")}
         if (event != null) {
-            val file = File(event.path)
-            if (file.exists()) {
-                mutants = parseMutations(event.path)
+            val virtualFile = event.file ?: return
+            val ioFile = File(virtualFile.path)
+            if (ioFile.exists()) {
+                mutants = parseMutations(ioFile)
                 val project = event.file?.let { ProjectLocator.getInstance().guessProjectForFile(it) }
                 project!!.service<GamificationService>().sendUserMutantKilled(mutants.filter { it.status == "KILLED" })
                 for(achievement in getMutantAchievements()) {
@@ -38,10 +39,9 @@ object MutationsListener : BulkFileListener {
         super.after(events)
     }
 
-    fun parseMutations(filePath: String): List<Mutation> {
+    fun parseMutations(file: File): List<Mutation> {
         val xmlMapper = XmlMapper().registerKotlinModule()
-        val wrapper = xmlMapper.readValue(File(filePath), MutationsWrapper::class.java)
-        return wrapper.mutation
+        return xmlMapper.readValue(file, MutationsWrapper::class.java).mutation
     }
 
 
